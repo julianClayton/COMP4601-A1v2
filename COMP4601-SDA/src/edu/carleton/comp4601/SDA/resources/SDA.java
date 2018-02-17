@@ -7,25 +7,28 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
+import edu.carleton.comp4601.utility.ServiceRegistrar;
 
 
 @Path("sda")
 public class SDA {
-	
 	@Context
 	UriInfo uriInfo;
 	@Context
 	Request request;
-
 	private String name;
 
 	public SDA() {
-		name = "Julian and Laura's SDA";
+		String sr = ServiceRegistrar.list();
+		name = "COMP4601 Searchable Document Archive V2.1:Julian and Laura" + sr;
+
 	}
 
 	@GET
 	public String printName() {
+		
 		return name;
+		
 	}
 
 	@GET
