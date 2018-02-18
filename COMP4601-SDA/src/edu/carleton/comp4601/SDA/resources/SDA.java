@@ -20,7 +20,7 @@ public class SDA {
 
 	public SDA() {
 		String sr = ServiceRegistrar.list();
-		name = "COMP4601 Searchable Document Archive V2.1:Julian and Laura" + sr;
+		name = "COMP4601 Searchable Document Archive V2.1:Laura and Julian" + sr;
 
 	}
 
