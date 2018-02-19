@@ -22,6 +22,7 @@ import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 
 public class Vertex implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 	private String url;
 	private int docID;
@@ -46,6 +47,7 @@ public class Vertex implements Serializable {
 		this.url = url;
 		this.page = page;
 		this.parent = parent;
+		setSDAdoc();
 		parseJsoup();
 		parseTika();
 	}
@@ -55,6 +57,7 @@ public class Vertex implements Serializable {
 		this.url = url;
 		this.page = page;
 		this.parent = null;
+		setSDAdoc();
 		parseJsoup();
 		parseTika();
 	}
@@ -87,6 +90,11 @@ public class Vertex implements Serializable {
 		return this.imgAltMap;
 	}
 	
+	private void setSDAdoc(){
+		SDAdoc.setId(this.docID);
+		SDAdoc.setUrl(this.url);
+		
+	}
 	
 	private void parseJsoup() {
 		if ((page.getParseData() instanceof HtmlParseData)) {
@@ -102,12 +110,9 @@ public class Vertex implements Serializable {
 	        this.text = jdoc.body().text();
 	        this.links = elementToList(jdoc.select("a[href]")); 
 	        this.imgAltMap = getImgAlts(jdoc);
-	       
-	        SDAdoc.toString();
 	        
 	        SDAdoc.setText(this.text);
-	        SDAdoc.setUrl(this.url);
-	        SDAdoc.setId(this.docID);
+	        SDAdoc.setName(jdoc.select("h0").toString());
 	        SDAdoc.setLinks(links);
 
 	        System.out.println("=====JSOUP PARSED DATA======");
@@ -116,6 +121,7 @@ public class Vertex implements Serializable {
 	       	System.out.println("Header:" + headings.toString());
 	       	System.out.println("Links:" + links.toString());
 		}
+
 	}
 	
 	private void parseTika() {
@@ -142,6 +148,13 @@ public class Vertex implements Serializable {
 	  	System.out.println("=====TIKA PARSED DATA======");
 	  	System.out.println("TITLE: " + title);
 	  	System.out.println("TYPE : " + type);
+	  	
+	  	
+	  	SDAdoc.setName(title);
+	  	if (type != "text/html"){
+	  		SDAdoc.setText(handler.toString());
+	  		SDAdoc.setName(title);
+	  	}
 	}
 	
 	
