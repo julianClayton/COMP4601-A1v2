@@ -1,0 +1,218 @@
+{
+	"info": {
+		"name": "COMP4601-SDA",
+		"_postman_id": "5afdcd37-5d43-7def-2fa2-88e91834cebc",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get SDA Main Page",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{domain}}:{{port}}/{{path}}",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{domain}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Add Document",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "test doc2",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "text",
+							"value": "julian's test doc",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "tags",
+							"value": "tag1, tag2, tag3",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "links",
+							"value": "www.google.ca, www.reddit.com",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{domain}}:{{port}}/{{path}}",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{domain}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Update Links and Tags ",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "links",
+							"value": "www.facebook.com",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "tags",
+							"value": "www.youtube.com",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{domain}}:{{port}}/{{path}}/DOC_ID_HERE",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{domain}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"DOC_ID_HERE"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get document",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{domain}}:{{port}}/{{path}}/DOC_ID_HERE",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{domain}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"DOC_ID_HERE"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete document",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{domain}}:{{port}}/{{path}}/DOC_ID_HERE",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{domain}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"DOC_ID_HERE"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Query documents",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{domain}}:{{port}}/{{path}}/search/QUERIES_HERE",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{domain}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"search",
+						"QUERIES_HERE"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Documents",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{protocol}}://{{domain}}:{{port}}/{{path}}/documents",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{domain}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"documents"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
