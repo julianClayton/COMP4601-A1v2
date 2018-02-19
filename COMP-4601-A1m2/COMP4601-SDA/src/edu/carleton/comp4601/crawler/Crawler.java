@@ -7,6 +7,12 @@ import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.url.WebURL;
 
+import edu.carleton.comp4601.SDA.db.DatabaseManager;
+import edu.carleton.comp4601.graph.Vertex;
+import edu.uci.ics.crawler4j.crawler.Page;
+import edu.uci.ics.crawler4j.crawler.WebCrawler;
+import edu.uci.ics.crawler4j.url.WebURL;
+
 public class Crawler extends WebCrawler{
 
 	
@@ -27,6 +33,11 @@ public class Crawler extends WebCrawler{
          System.out.println("DocID : " + docID);
          
          Vertex v = new Vertex (url, page);
+         
+         DatabaseManager dm = DatabaseManager.getInstance();
+         dm.addDocToDb(v.getDoc());
+         
+         
      }
 
 
