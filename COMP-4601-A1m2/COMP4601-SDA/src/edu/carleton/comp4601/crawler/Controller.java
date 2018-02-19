@@ -2,6 +2,8 @@ package edu.carleton.comp4601.crawler;
 
 import java.util.ArrayList;
 
+import edu.carleton.comp4601.SDA.db.DatabaseManager;
+import edu.carleton.comp4601.graph.PageGraph;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -15,18 +17,18 @@ public class Controller {
 	static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
 	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/";
 	static final public String SEED3 = "https://www.reddit.com/";
-
+	public static PageGraph pageGraph;
     
     public static void main(String[] args) throws Exception {
         int numCrawlers = 3;
-
+        pageGraph = new PageGraph();
         CrawlConfig config = new CrawlConfig();
         
         String crawlStorageFolder = ".";
 
         config.setCrawlStorageFolder(crawlStorageFolder);
         
-        config.setMaxPagesToFetch(100);
+        config.setMaxPagesToFetch(10);
 
         config.setPolitenessDelay(1000);
 
@@ -46,5 +48,9 @@ public class Controller {
        // controller.addSeed(SEED3);
        
         controller.start(Crawler.class, numCrawlers);
+        
+        DatabaseManager.getInstance().addGraphToDb(pageGraph);
+        PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
+        System.out.println(pg.getGraph().toString());;
     }
 }

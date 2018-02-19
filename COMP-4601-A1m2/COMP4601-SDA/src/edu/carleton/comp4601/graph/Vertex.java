@@ -18,6 +18,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.xml.sax.SAXException;
 
+
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 
@@ -51,7 +52,12 @@ public class Vertex implements Serializable {
 		parseJsoup();
 		parseTika();
 	}
-	
+	//This is the constructor for the initial base vertexs
+	public Vertex(Vertex parent, String url) {
+		this.parent = parent;
+		this.url = url;
+		
+	}
 	public Vertex(String url, Page page){
 		this.SDAdoc = new edu.carleton.comp4601.dao.Document();
 		this.url = url;
