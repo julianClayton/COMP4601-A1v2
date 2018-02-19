@@ -2,10 +2,11 @@ package edu.carleton.comp4601.crawler;
 
 import edu.carleton.comp4601.graph.PageGraph;
 import edu.carleton.comp4601.graph.Vertex;
+import edu.carleton.comp4601.pagerank.PageRank;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.url.WebURL;
-
+import Jama.Matrix;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 
 
@@ -41,5 +42,6 @@ public class Crawler extends WebCrawler{
          else {
         	 Controller.pageGraph.addVertex(v);
          }      
+      
      }
 }
