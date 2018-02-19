@@ -51,6 +51,6 @@ public class Controller {
         
         DatabaseManager.getInstance().addGraphToDb(pageGraph);
         PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
-        System.out.println(pg.getGraph().toString());;
+        
     }
 }
