@@ -1,6 +1,10 @@
 package edu.carleton.comp4601.SDA.db;
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import edu.carleton.comp4601.graph.*;
+import edu.carleton.comp4601.networking.Marshaller;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -211,5 +215,40 @@ public class DatabaseManager {
 	
 	private void switchCollection(String collection) {
 		col = db.getCollection(collection);
+	}
+	public void removeOldGraph(PageGraph graph) {
+		switchCollection(GRAPH_COL);
+		col.remove(new BasicDBObject("name", graph.getName()));
+	}
+	
+	public void addGraphToDb(PageGraph graph) {
+		switchCollection(GRAPH_COL);
+		removeOldGraph(graph);
+		byte[] bytes = null;
+		try {
+			bytes = Marshaller.serializeObject(graph);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		DBObject pgraph = BasicDBObjectBuilder.start().add("graphbytes", bytes).add("iterations", graph.incrementIterations()).add("name", graph.getName()).get();
+		col.save(pgraph);
+		
+	}
+	public PageGraph loadGraphFromDB() {
+		switchCollection(GRAPH_COL);
+		DBObject o = null;
+		BasicDBObject whereQuery = new BasicDBObject();
+		DBCursor cursor = col.find(whereQuery);
+		while(cursor.hasNext()) {
+		     o = cursor.next();
+		}
+		byte[] bytes = (byte[]) o.get("graphbytes");
+		PageGraph g = null;
+		try {
+			g = (PageGraph) Marshaller.deserializeObject(bytes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return g;
 	}
 }
