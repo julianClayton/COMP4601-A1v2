@@ -2,6 +2,7 @@ package edu.carleton.comp4601.crawler;
 
 import java.util.regex.Pattern;
 
+import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.graph.Vertex;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
@@ -27,6 +28,11 @@ public class Crawler extends WebCrawler{
          System.out.println("DocID : " + docID);
          
          Vertex v = new Vertex (url, page);
+         
+         DatabaseManager dm = DatabaseManager.getInstance();
+         dm.addDocToDb(v.getDoc());
+         
+         
      }
 
 

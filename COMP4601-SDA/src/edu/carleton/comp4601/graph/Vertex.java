@@ -3,6 +3,7 @@ package edu.carleton.comp4601.graph;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -23,29 +24,34 @@ import edu.uci.ics.crawler4j.parser.HtmlParseData;
 public class Vertex implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String url;
-	private String docID;
+	private int docID;
 	private Vertex parent;
 	private HashSet<Vertex> children;
 	private Page page;
 	
-	private HashSet<String> links;
+	private edu.carleton.comp4601.dao.Document SDAdoc;
+	
+	private ArrayList<String> links;
 	private HashMap<String, String> imgAltMap;
-	private HashSet<String> text;
-	private HashSet<String> headings;
+	private String text;
+	private ArrayList<String> headings;
 	
 	private String title;
 	private String type;
 	
-	public Vertex(Vertex parent, String url, Page page ){
+	public Vertex(Vertex parent, String url, Page page){
+		this.docID =  page.getWebURL().getDocid();
+		
+		this.SDAdoc = new edu.carleton.comp4601.dao.Document();
 		this.url = url;
 		this.page = page;
 		this.parent = parent;
 		parseJsoup();
 		parseTika();
-		
 	}
 	
 	public Vertex(String url, Page page){
+		this.SDAdoc = new edu.carleton.comp4601.dao.Document();
 		this.url = url;
 		this.page = page;
 		this.parent = null;
@@ -53,20 +59,57 @@ public class Vertex implements Serializable {
 		parseTika();
 	}
 	
+	public edu.carleton.comp4601.dao.Document getDoc(){
+		return this.SDAdoc;
+	}
+	
+	public int getID(){
+		return this.docID;
+	}
+	
+	public String getUrl(){
+		return this.url;
+	}
+	
+	public ArrayList<String> getLinks() {
+		return this.links;
+	}
+	
+	public String getText() {
+		return this.text;
+	}
+	
+	public ArrayList<String> getHeadings() {
+		return this.headings;
+	}
+	
+	public HashMap<String, String> getImages() {
+		return this.imgAltMap;
+	}
+	
+	
 	private void parseJsoup() {
 		if ((page.getParseData() instanceof HtmlParseData)) {
         HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
         String html = htmlParseData.getHtml();
         
 	        //parse elements with Jsoup
-	        Document doc = Jsoup.parse(html);
+	        Document jdoc = Jsoup.parse(html);
 	        
 	        //convert Elements to Set so Vertex can be Serializable
-	        this.headings = elementToSet(doc.select("h0,h1,h2,h3,h4,h5"));
-	        this.text = elementToSet(doc.select("p"));
-	        this.links = elementToSet(doc.select("a[href]")); 
-	        this.imgAltMap = getImgAlts(doc);
 	        
+	        this.headings = elementToList(jdoc.select("h0,h1,h2,h3,h4,h5"));
+	        this.text = jdoc.body().text();
+	        this.links = elementToList(jdoc.select("a[href]")); 
+	        this.imgAltMap = getImgAlts(jdoc);
+	       
+	        SDAdoc.toString();
+	        
+	        SDAdoc.setText(this.text);
+	        SDAdoc.setUrl(this.url);
+	        SDAdoc.setId(this.docID);
+	        SDAdoc.setLinks(links);
+
 	        System.out.println("=====JSOUP PARSED DATA======");
 	       	System.out.println("Text:" + text.toString());
 	       	System.out.println("Images + Alts:" + imgAltMap.toString());
@@ -112,16 +155,15 @@ public class Vertex implements Serializable {
 				hm.put(i.attr("src"),i.attr("alt")); //src and alt info
 			}
 		}
-		
 		return hm;
 	}
 	
-	private HashSet<String> elementToSet(Elements el){
-		HashSet<String> hs = new HashSet<String>();
+	private ArrayList<String> elementToList(Elements el){
+		ArrayList<String> al = new ArrayList<String>();
 		for	(Element	e	:	el)	{	
-      		 hs.add(e.text());
+      		 al.add(e.text());
         }	
-		return hs;
+		return al;
 	}
 
 }
