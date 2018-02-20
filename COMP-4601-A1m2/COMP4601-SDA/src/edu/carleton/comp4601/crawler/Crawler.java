@@ -32,7 +32,7 @@ public class Crawler extends WebCrawler{
          Vertex v = new Vertex (url, page);
          
          DatabaseManager dm = DatabaseManager.getInstance();
-         dm.addDocToDb(v.getDoc());
+         dm.addVertexToDb(v);
          if (Controller.pageGraph.hasVertex(parentUrl)) {
         	 System.out.println("Has parent url: " + parentUrl);
         	 System.out.println("Current url: " + url);

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -38,11 +39,15 @@ public class Vertex implements Serializable {
 	private String text;
 	private ArrayList<String> headings;
 	
+	private Date timestamp;
+	
 	private String title;
 	private String type;
 	
 	public Vertex(Vertex parent, String url, Page page){
 		this.docID =  page.getWebURL().getDocid();
+		
+		timestamp = new Date();
 		
 		this.SDAdoc = new edu.carleton.comp4601.dao.Document();
 		this.url = url;
@@ -60,6 +65,7 @@ public class Vertex implements Serializable {
 	}
 	public Vertex(String url, Page page){
 		this.SDAdoc = new edu.carleton.comp4601.dao.Document();
+		timestamp = new Date();
 		this.url = url;
 		this.page = page;
 		this.parent = null;
@@ -88,6 +94,14 @@ public class Vertex implements Serializable {
 		return this.text;
 	}
 	
+	public String getType() {
+		return this.type;
+	}
+	
+	public String getTime(){
+		return timestamp.toString();
+	}
+	
 	public ArrayList<String> getHeadings() {
 		return this.headings;
 	}
@@ -99,7 +113,6 @@ public class Vertex implements Serializable {
 	private void setSDAdoc(){
 		SDAdoc.setId(this.docID);
 		SDAdoc.setUrl(this.url);
-		
 	}
 	
 	private void parseJsoup() {
