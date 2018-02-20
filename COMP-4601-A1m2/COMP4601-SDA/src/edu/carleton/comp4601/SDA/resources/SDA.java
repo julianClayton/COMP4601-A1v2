@@ -22,6 +22,8 @@ import javax.ws.rs.core.UriInfo;
 
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.dao.Document;
+import edu.carleton.comp4601.dao.DocumentCollection;
+import edu.carleton.comp4601.searching.MyLucene;
 import edu.carleton.comp4601.utility.ServiceRegistrar;
 
 
@@ -68,11 +70,14 @@ public class SDA {
 		
 		try {
 			DatabaseManager.getInstance().addDocToDb(document);
+			MyLucene.addDocument(document);
 		}catch (Exception e) {
 			return Response.status(204).build();
 		}
 		return Response.ok().build();
 	}
+	
+
 	
 	@POST
 	@Path("{DOC_ID}")
@@ -104,8 +109,17 @@ public class SDA {
 		}
 		return Response.ok().build();
 	}
-	
-	
+
+	@GET
+	@Path("/reset")
+	@Produces(MediaType.TEXT_HTML)
+	public String reset() {
+		boolean reset = DatabaseManager.getInstance().deleteAllDocuments();
+		if (reset){
+			return "All documents reset";
+		}
+		return "ERROR: could not remove docs";
+	}
 	
 	@GET
 	@Path("{DOC_ID}")	
@@ -162,6 +176,23 @@ public class SDA {
 		htmlList = htmlList + "</ul>";
 		return "<html><head><title>Document List</title></head><body><h1>Documents with tag(s) " + titleString + "</h1>" + htmlList +"</body></html>";
 	}
+
+	@GET 
+	@Path("query/{TERMS}")
+	@Produces(MediaType.TEXT_HTML)
+	public String queryDocsWithTerms(@PathParam("TERMS") String terms) {
+	    ArrayList<Document> queryDocs = MyLucene.query(terms);
+	    DocumentCollection docs = new DocumentCollection();
+	    docs.setDocuments(queryDocs);
+	    String htmlList = "<ul>";
+		for (Document doc : queryDocs) {
+			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
+			htmlList = htmlList +  "<li>" + link + "</li>";
+		}
+		htmlList = htmlList + "</ul>";
+		return "<html><head><title>Document List</title></head><body><h1>Documents that match terms(s) " + terms + "</h1>" + htmlList +"</body></html>";
+	}
+	
 	@GET 
 	@Path("documents")
 	@Produces(MediaType.TEXT_HTML)

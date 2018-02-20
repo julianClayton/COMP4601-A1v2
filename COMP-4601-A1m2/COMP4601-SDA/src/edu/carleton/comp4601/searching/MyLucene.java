@@ -17,6 +17,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -80,13 +81,14 @@ public class MyLucene {
 		try{
 			Document lucDoc	=	new	Document();	
 			
-			int docId = (int)object.get("id");
+			String docId = object.get("id").toString();
 			String url = (String)object.get("url");
 			String text = (String)object.get("text");
 			String type = (String)object.get("metadata");
 			String ts = (String)object.get("timestamp");
 		
-			lucDoc.add(new	IntField(DOC_ID, docId, Field.Store.YES));	
+			System.out.println("Id" + docId + "\nurl: " + url + "\ntext " + text + "\ntype:'" + type + "\ndate:" + ts);
+			lucDoc.add(new	StringField(DOC_ID, docId, Field.Store.YES));	
 			lucDoc.add(new	StringField(URL, url, Field.Store.YES));
 			lucDoc.add(new	TextField(CONTENT, text, Field.Store.YES));
 			lucDoc.add(new	StringField(DATE, ts, Field.Store.YES));
@@ -102,12 +104,12 @@ public class MyLucene {
 	
 	public	static ArrayList<edu.carleton.comp4601.dao.Document> query(String searchStr)	{	
 		try	{	
-		    IndexReader reader	= DirectoryReader.open(FSDirectory.open(new File(INDEX_DIR)));	
-			IndexSearcher	searcher = new IndexSearcher(reader);	
-			Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);	
-			QueryParser parser = new QueryParser(Version.LUCENE_45, CONTENT, analyzer);	
-			Query q = parser.parse(searchStr);	
-			TopDocs results = searcher.search(q, 100); 	
+		    IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(INDEX_DIR)));
+			IndexSearcher searcher = new IndexSearcher(reader);
+			Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_45);
+			QueryParser parser = new QueryParser(Version.LUCENE_45, CONTENT, analyzer);
+			Query q = parser.parse(searchStr);
+			TopDocs results = searcher.search(q, 100);
 		 	
 		 	ScoreDoc[]	hits =	results.scoreDocs;
 		 	
@@ -134,5 +136,30 @@ public class MyLucene {
 		return	null;	
 	}
 	
+	public static void addDocument(edu.carleton.comp4601.dao.Document newDoc){
+		try {
+			dir	= FSDirectory.open(new	File(INDEX_DIR));
+			Analyzer analyzer = new	StandardAnalyzer(Version.LUCENE_45);
+			IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_45, analyzer);
+			writer = new IndexWriter(dir, iwc);
+			Document doc = new Document();
+			
+			doc.add(new	StringField(URL, "Url undefined: user created doc", Field.Store.YES));
+			doc.add(new	StringField(DOC_ID, newDoc.getId().toString(), Field.Store.YES));
+			doc.add(new	StringField(DATE, new Date().toString(), Field.Store.YES));
+			doc.add(new	TextField(CONTENT, newDoc.getText(), Field.Store.YES));
+			doc.add(new	TextField(METADATA, "User created doc", Field.Store.YES));
+
+			System.out.println("adding document " + newDoc.getId());
+			writer.addDocument(doc);
+
+			if	(writer != null)
+				writer.close();
+		 	if	(dir != null)
+				dir.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 }

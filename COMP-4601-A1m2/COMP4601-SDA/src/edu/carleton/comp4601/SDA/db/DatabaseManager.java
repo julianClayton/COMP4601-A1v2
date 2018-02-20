@@ -197,7 +197,20 @@ public class DatabaseManager {
 		}
 		return docsDeleted;
 	}
-	
+
+	public boolean deleteAllDocuments() {
+		switchCollection(DOC_COL);
+		DBCursor cursor = col.find();
+		boolean docsDeleted = false;
+
+		while(cursor.hasNext()) {
+			col.remove(cursor.next());
+			docsDeleted = true;
+		}
+
+		return docsDeleted;
+	}
+
 	public ArrayList<Document> getDocumentsWithTags(ArrayList<String> tags) {
 		switchCollection(DOC_COL);
 		BasicDBObject inQuery = new BasicDBObject();
