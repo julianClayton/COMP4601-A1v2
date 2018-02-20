@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.graph.PageGraph;
+import edu.carleton.comp4601.searching.MyLucene;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -15,7 +16,7 @@ public class Controller {
 	public static ArrayList<String> urls = new ArrayList<String>();
 	
 	static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
-	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/";
+	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/N-0";
 	static final public String SEED3 = "https://www.reddit.com/";
 	public static PageGraph pageGraph;
     
@@ -45,12 +46,18 @@ public class Controller {
 
         controller.addSeed(SEED1);
         controller.addSeed(SEED2);
-       // controller.addSeed(SEED3);
+        controller.addSeed(SEED3);
        
         controller.start(Crawler.class, numCrawlers);
         
         DatabaseManager.getInstance().addGraphToDb(pageGraph);
         PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
+        System.out.println(pg.getGraph().toString());;
         
+        
+        MyLucene.indexLucene(DatabaseManager.getInstance().getAllDocCursor());
+        
+        System.out.print("Results: " + MyLucene.query("+banana +coconut").toString());
+   
     }
 }

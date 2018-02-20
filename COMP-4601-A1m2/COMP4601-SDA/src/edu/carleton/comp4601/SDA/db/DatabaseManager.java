@@ -53,6 +53,28 @@ public class DatabaseManager {
 		return num;
 	}
 	
+	public Document findDoc(int docId){
+		switchCollection(DOC_COL);
+		DBCursor cur = col.find(new BasicDBObject("id", docId));
+		DBObject searchObj = null;
+		if (cur.hasNext()) {
+			searchObj = cur.next();
+		}
+		DBObject obj = searchObj;
+		
+		if (obj != null){
+			Document document = new Document();
+			document.setId((Integer) obj.get("id"));
+			document.setUrl((String) obj.get("url"));
+			document.setLinks((ArrayList<String>) obj.get("links"));
+			document.setTags((ArrayList<String>) obj.get("tags"));
+			document.setText((String) obj.get("text"));
+			document.setName((String) obj.get("name"));
+			return document;
+		}
+		return null;
+	}
+	
 	public void incrementDocNum() {
 		switchCollection(DOC_NUM_COL);
 		DBCursor cur = col.find().limit(1);
@@ -76,6 +98,7 @@ public class DatabaseManager {
 		DBObject obj = BasicDBObjectBuilder
 				.start("name", document.getName())
 				.add("id", document.getId())
+				.add("url", document.getUrl())
 				.add("text", document.getText())
 				.add("tags",document.getTags())
 				.add("links", document.getLinks())
@@ -83,6 +106,27 @@ public class DatabaseManager {
 
 		col.save(obj);
 	}
+	
+	public void addVertexToDb(Vertex vert) {
+		incrementDocNum();
+		Document document = vert.getDoc();
+		int id = getDocNum();
+		switchCollection(DOC_COL);
+		document.setId(id);
+		DBObject obj = BasicDBObjectBuilder
+				.start("name", document.getName())
+				.add("id", document.getId())
+				.add("url", document.getUrl())
+				.add("text", document.getText())
+				.add("tags",document.getTags())
+				.add("links", document.getLinks())
+				.add("metadata",vert.getType())
+				.add("timestamp",vert.getTime())
+				.get();
+
+		col.save(obj);
+	}
+	
 
 	public void updateDocLinks(int id, ArrayList<String> links) {
 		switchCollection(DOC_COL);
@@ -118,6 +162,7 @@ public class DatabaseManager {
 		}
 		Document document = new Document();
 		document.setId((Integer) obj.get("id"));
+		document.setUrl( (String) obj.get("url"));
 		document.setLinks((ArrayList<String>) obj.get("links"));
 		document.setTags((ArrayList<String>) obj.get("tags"));
 		document.setText((String) obj.get("text"));
@@ -164,6 +209,7 @@ public class DatabaseManager {
 			obj = cursor.next();
 			Document document = new Document();
 			document.setId((Integer) obj.get("id"));
+			document.setUrl((String) obj.get("url"));
 			document.setLinks((ArrayList<String>) obj.get("links"));
 			document.setTags((ArrayList<String>) obj.get("tags"));
 			document.setText((String) obj.get("text"));
@@ -182,6 +228,7 @@ public class DatabaseManager {
 			obj = cursor.next();
 			Document document = new Document();
 			document.setId((Integer) obj.get("id"));
+			document.setUrl((String) obj.get("url"));
 			document.setLinks((ArrayList<String>) obj.get("links"));
 			document.setTags((ArrayList<String>) obj.get("tags"));
 			document.setText((String) obj.get("text"));
@@ -189,6 +236,13 @@ public class DatabaseManager {
 			docs.add(document);
 		}
 		return docs;
+	}
+	
+	public DBCursor getAllDocCursor(){
+		switchCollection(DOC_COL);
+		BasicDBObject query	= new BasicDBObject();	
+		DBCursor cursor = col.find(query);	
+		return cursor;
 	}
 
 	
