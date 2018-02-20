@@ -2,8 +2,10 @@ package edu.carleton.comp4601.crawler;
 
 import java.util.ArrayList;
 
+import Jama.Matrix;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.graph.PageGraph;
+import edu.carleton.comp4601.pagerank.PageRank2;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -51,6 +53,7 @@ public class Controller {
         
         DatabaseManager.getInstance().addGraphToDb(pageGraph);
         PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
-        
+        Matrix m = PageRank2.computePageRank(pg.getGraph());
+        m.print(m.getRowDimension(), m.getColumnDimension());
     }
 }

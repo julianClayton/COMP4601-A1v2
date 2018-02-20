@@ -4,6 +4,7 @@ import java.awt.List;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -20,6 +21,11 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+
+import com.mongodb.MongoException;
+
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.utility.ServiceRegistrar;
@@ -32,14 +38,15 @@ public class SDA {
 	@Context
 	Request request;
 	private String name;
-
+	
 	public SDA() {
-		String sr = ServiceRegistrar.list();
-		name = "COMP4601 Searchable Document Archive V2.1:Julian and Laura" + sr;
+		name = "COMP4601 Searchable Document Archive V2.1: Julian and Laura";
 	}
+	
 	@GET
+	@Produces(MediaType.TEXT_HTML)
 	public String sda2() {
-		return name;
+		return "<html><head><title>COMP 4601</title></head><body><h1>"+ name +"</h1></body></html>";
 	}
 
 	@POST
@@ -111,15 +118,15 @@ public class SDA {
 	@Path("{DOC_ID}")	
 	@Produces(MediaType.TEXT_HTML)
 	public String getDoc(@PathParam("DOC_ID") String id) {
+		String regex = "\\d+";
+		if (!id.matches(regex)) {
+			return resetDocuments(id);
+		}
 		Document doc = DatabaseManager.getInstance().getDocument(Integer.parseInt(id));
 		return "Name: " + doc.getName() + "\n Text: " + doc.getText() + "\n Links: " + doc.getLinks() + "\n Tags: " + doc.getTags();		
 	}
-	@Path("{DOC_ID}")	
-	@Produces(MediaType.TEXT_XML)
-	public String getDocXml(@PathParam("DOC_ID") String id) {
-		Document doc = DatabaseManager.getInstance().getDocument(Integer.parseInt(id));
-		return "Name: " + doc.getName() + "\n Text: " + doc.getText() + "\n Links: " + doc.getLinks() + "\n Tags: " + doc.getTags();		
-	}
+	
+
 	
 	@DELETE
 	@Path("{DOC_ID}")
@@ -178,6 +185,39 @@ public class SDA {
 		return "<html><head><title>Document List</title></head><body><h1>All Documents</h1>" + htmlList +"</body></html>";
 	}
 	
+	@GET
+	@Path("list")
+	@Produces(MediaType.TEXT_HTML)
+	public String listDiscoveredServices() {
+		String sr = ServiceRegistrar.list();
+		return sr;
+	}
+	private String resetDocuments(String path) {
+		if (!path.toLowerCase().equals("reset")) {
+			return Response.status(404).build().toString();
+		}
+		DatabaseManager dbm = DatabaseManager.getInstance();
+		try {
+			dbm.dropDocuments();
+		} catch (MongoException e) {
+			return "<html><head><title>Document Reset Failed!</title></head></html>";
+		}
+		return "<html><head><title>Documents Dropped!</title></head></html>";
+	}
+	
+	@GET
+	@Path("pagerank")
+	@Produces(MediaType.TEXT_HTML)
+	public String getDocPageRanks() {
+		DatabaseManager dbm = DatabaseManager.getInstance();
+		ArrayList<HashMap<String, Float>> documents = dbm.getAllPageRanks();
+		for (HashMap doc : documents) {
+			System.out.println(doc.keySet());
+			System.out.println(doc.values());
+		}
+		
+		return "";
+	}
 	
 	
 	public String sayXML() {
