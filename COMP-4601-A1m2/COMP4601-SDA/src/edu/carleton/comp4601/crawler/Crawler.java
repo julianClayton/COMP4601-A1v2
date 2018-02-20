@@ -2,6 +2,8 @@ package edu.carleton.comp4601.crawler;
 
 import edu.carleton.comp4601.graph.PageGraph;
 import edu.carleton.comp4601.graph.Vertex;
+import edu.carleton.comp4601.pagerank.PageRank;
+import edu.carleton.comp4601.pagerank.PageRank2;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.url.WebURL;
@@ -34,13 +36,10 @@ public class Crawler extends WebCrawler{
          DatabaseManager dm = DatabaseManager.getInstance();
          dm.addVertexToDb(v);
          if (Controller.pageGraph.hasVertex(parentUrl)) {
-        	 System.out.println("Has parent url: " + parentUrl);
-        	 System.out.println("Current url: " + url);
         	 Controller.pageGraph.connectToExistingVertex(v, parentUrl);
          }
          else {
         	 Controller.pageGraph.addVertex(v);
          }      
-      
      }
 }

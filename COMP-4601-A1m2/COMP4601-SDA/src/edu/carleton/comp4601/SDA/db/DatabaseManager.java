@@ -2,9 +2,11 @@ package edu.carleton.comp4601.SDA.db;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import edu.carleton.comp4601.graph.*;
 import edu.carleton.comp4601.networking.Marshaller;
+import edu.carleton.comp4601.pagerank.PageRank2;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -14,6 +16,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
+import Jama.Matrix;
 import edu.carleton.comp4601.dao.Document;
 
 public class DatabaseManager {
@@ -27,10 +30,13 @@ public class DatabaseManager {
 	private DBCollection col;
 	private DB db;
 	private static DatabaseManager instance;
+	private static PageGraph pageGraph;
 	
 	public DatabaseManager() {
 		instance = this;
 		initConnection();
+		
+		pageGraph = instance.loadGraphFromDB();
 		
 	}
 
@@ -316,6 +322,33 @@ public class DatabaseManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		return g;
+	}
+	public boolean dropDocuments() {
+		switchCollection(DOC_COL);
+		BasicDBObject document = new BasicDBObject();
+		col.remove(document);
+		DBCursor cursor = col.find();
+		boolean success = false;
+		while (cursor.hasNext()) {
+		    col.remove(cursor.next());
+		    success = true;
+		}
+		return success;
+	}
+	
+	public ArrayList<HashMap<String, Float>> getAllPageRanks() {
+		PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
+		ArrayList<Document> documents = getAllDocuments();
+		ArrayList<HashMap<String, Float>> documentsWithRank = new ArrayList<HashMap<String, Float>>();
+		Matrix prMatrix = PageRank2.computePageRank(pg.getGraph());
+		System.out.println("pagerank");
+		for (int i = 0; i < documents.size(); i++) {
+			HashMap map = new HashMap<String, Float>();
+			map.put(documents.get(i).getName(), (float) prMatrix.get(0, i));
+			documentsWithRank.add(map);
+		}
+		return documentsWithRank;
 	}
 }
