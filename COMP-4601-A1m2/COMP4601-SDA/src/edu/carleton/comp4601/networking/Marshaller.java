@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
 
 public class Marshaller {
 
-	// return a byte array representing the serialized version of an object
 
 	public static byte[] serializeObject(Object o) throws IOException {
 		if (o == null) {

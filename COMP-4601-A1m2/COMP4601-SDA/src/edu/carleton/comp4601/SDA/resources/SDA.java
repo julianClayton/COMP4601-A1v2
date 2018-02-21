@@ -1,11 +1,16 @@
 package edu.carleton.comp4601.SDA.resources;
 
 import java.awt.List;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -20,7 +25,24 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import edu.uci.ics.crawler4j.crawler.Page;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.xml.sax.SAXException;
 
+import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
@@ -30,7 +52,16 @@ import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.dao.DocumentCollection;
 import edu.carleton.comp4601.searching.MyLucene;
+import edu.carleton.comp4601.graph.PageGraph;
+import org.jgrapht.*;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.Graph;
+import edu.carleton.comp4601.graph.Vertex;
+import edu.carleton.comp4601.networking.Marshaller;
+import edu.carleton.comp4601.pagerank.PageRank3;
 import edu.carleton.comp4601.utility.ServiceRegistrar;
+import edu.uci.ics.crawler4j.crawler.Page;
 
 
 @Path("sda")
@@ -241,15 +272,60 @@ public class SDA {
 	@Produces(MediaType.TEXT_HTML)
 	public String getDocPageRanks() {
 		DatabaseManager dbm = DatabaseManager.getInstance();
-		ArrayList<HashMap<String, Float>> documents = dbm.getAllPageRanks();
-		for (HashMap doc : documents) {
+		PageGraph pg = new PageGraph();
+		Vertex vertex = new Vertex("", new Page(null));
+		Page page = new Page(null);
+		dbm.getAllPageRanks(pg);
+		//ArrayList<HashMap<String, Float>> documents = dbm.getAllPageRanks();
+		/*for (HashMap doc : documents) {
 			System.out.println(doc.keySet());
 			System.out.println(doc.values());
-		}
+		}*/
 		
 		return "";
 	}
 	
+	@GET
+	@Path("graph")
+	@Produces(MediaType.TEXT_HTML)
+	public String getGraph() {
+		PageGraph pg = new PageGraph();
+		Vertex vertex = new Vertex("", new Page(null));
+		Page page = new Page(null);
+		Graph directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
+	  	java.io.InputStream	input;	
+	  	org.apache.tika.metadata.Metadata	metadata	=	new org.apache.tika.metadata.Metadata();
+	  	ParseContext	context	=	new ParseContext();	
+	  	Parser	parser	=	new AutoDetectParser();
+		DatabaseManager dbm = DatabaseManager.getInstance();
+		byte[] b = dbm.loadGraphFromDB2();
+		pg = null;
+		try {
+			pg = (PageGraph) Marshaller.deserializeObject(b);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(pg.getName());
+		System.out.println(pg.getGraph());
+		return pg.getGraph().toString();
+	}
+	@GET
+	@Path("pagerank2")
+	@Produces(MediaType.TEXT_HTML)
+	public String getGraph2() {
+		//PageGraph pg = new PageGraph();
+		//Vertex vertex = new Vertex("", new Page(null));
+		//Page page = new Page(null);
+		//Graph directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
+	  	java.io.InputStream	input;	
+	  	org.apache.tika.metadata.Metadata	metadata	=	new org.apache.tika.metadata.Metadata();
+	  	ParseContext	context	=	new ParseContext();	
+	  	Parser	parser	=	new AutoDetectParser();
+		DatabaseManager dbm = DatabaseManager.getInstance();
+		
+		ArrayList<HashMap<String, Float>> psg = PageRank3.getInstance().computePageRank();
+		return "";
+	}
 	
 	public String sayXML() {
 		return "<?xml version=\"1.0\"?>" + "<bank> " + name + " </bank>";

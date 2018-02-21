@@ -1,6 +1,9 @@
 package edu.carleton.comp4601.pagerank;
 import Jama.Matrix;
+import edu.carleton.comp4601.SDA.db.DatabaseManager;
+import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.graph.PageGraph;
+import edu.carleton.comp4601.networking.Marshaller;
 
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -9,15 +12,37 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
 import org.jgrapht.io.*;
 
-public class PageRank2 {
-	final static double alpha =   0.5;
+public class PageRank3 {
+	final  double alpha =   0.5;
 	static Matrix pageRankMatrix;
+	private static PageRank3 instance;
+	private boolean rankComplete = false; 
+	PageGraph pg;
 	
-	public static int sumRow(Matrix A, int row) {
+	public PageRank3() {
+		instance= this;
+		try {
+			pg = (PageGraph) Marshaller.deserializeObject(DatabaseManager.getInstance().loadGraphFromDB2());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static PageRank3 getInstance() {
+		if (instance == null) {
+			instance = new PageRank3();
+		}
+		return instance;
+	}
+	
+	
+	public  int sumRow(Matrix A, int row) {
 	    int sum = 0;
 	    for(int i = 0; i < A.getColumnDimension(); i++) {
 	        sum += A.getArray()[row][i];
@@ -25,7 +50,7 @@ public class PageRank2 {
 	    return sum;
 	}
 	
-	public static Matrix generateTransitionMatrix(Matrix A) {
+	public  Matrix generateTransitionMatrix(Matrix A) {
 		Matrix B = A;
 		for (int row = 0; row < A.getRowDimension(); row++) {
 			double sum = sumRow(A, row);
@@ -40,19 +65,19 @@ public class PageRank2 {
 		}
 		return B;
 	}
-	public static float getDocumentPageRank(int docId) {
+	public  float getDocumentPageRank(int docId) {
 
 		float documentRank = (float) pageRankMatrix.get(0, docId);
 		return documentRank;
 }
-	private static Matrix multipleMatrixByAlpha(Matrix matrix) {
+	private  Matrix multipleMatrixByAlpha(Matrix matrix) {
 
 		matrix = matrix.times((1.0 - alpha));
 		return matrix;
 
 	}
 
-	private static Matrix addMatrices(Matrix matrix) {
+	private  Matrix addMatrices(Matrix matrix) {
 		int row = matrix.getRowDimension();
 		int col = matrix.getColumnDimension();
 
@@ -61,8 +86,8 @@ public class PageRank2 {
 
 		return result;
 	}
-	public static Matrix computePageRank(Graph pg) {
-		Matrix adjacencyMatrix = generateAdjacencyMatrix(pg);
+	public  ArrayList<HashMap<String, Float>> computePageRank() {
+		Matrix adjacencyMatrix = generateAdjacencyMatrix(pg.getGraph());
 		int size = adjacencyMatrix.getColumnDimension();
 		Matrix matrix = new Matrix(1, size);
 		matrix.set(0, 0, 1.0);
@@ -81,12 +106,26 @@ public class PageRank2 {
 			diff = copy.minus(matrix).normF();
 		}
 		pageRankMatrix = matrix;
-		return matrix;
+		rankComplete = true;
+		
+		
+		ArrayList<Document> documents = DatabaseManager.getInstance().getAllDocuments();
+		ArrayList<HashMap<String, Float>> documentsWithRank = new ArrayList<HashMap<String, Float>>();
+		System.out.println("pagerank matrix");
+		pageRankMatrix.print(pageRankMatrix.getRowDimension(), pageRankMatrix.getColumnDimension());
+		for (int i = 0; i < documents.size(); i++) {
+			HashMap map = new HashMap<String, Float>();
+			map.put(documents.get(i).getName(), (float) pageRankMatrix.get(0, i));
+			documentsWithRank.add(map);
+		}
+		
+		return documentsWithRank;
 
 	}
-	public static Matrix generateAdjacencyMatrix(Graph g) {
+	public  Matrix generateAdjacencyMatrix(Graph g) {
 		String fName = "adjacencymatrix";
 		BufferedWriter writer = null;
+		System.out.println(g.toString());
 		CSVExporter<String, DefaultEdge> csvExporter = new CSVExporter<String, DefaultEdge>(CSVFormat.MATRIX);
 		try {
 			writer = new BufferedWriter(new FileWriter(fName));

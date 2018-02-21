@@ -30,19 +30,15 @@ public class DatabaseManager {
 	private DBCollection col;
 	private DB db;
 	private static DatabaseManager instance;
-	private static PageGraph pageGraph;
 	
 	public DatabaseManager() {
 		instance = this;
 		initConnection();
-		
-		pageGraph = instance.loadGraphFromDB();
-		
 	}
 
-	public boolean graphExists(String name) {
+	public boolean graphExists() {
 		switchCollection(GRAPH_COL);
-		DBCursor cur = col.find(new BasicDBObject("name", name)).limit(1);
+		DBCursor cur = col.find().limit(1);
 		if (cur.hasNext()) {
 			return true;
 		}
@@ -303,7 +299,7 @@ public class DatabaseManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		DBObject pgraph = BasicDBObjectBuilder.start().add("graphbytes", bytes).add("iterations", graph.incrementIterations()).add("name", graph.getName()).get();
+		DBObject pgraph = BasicDBObjectBuilder.start().add("graphbytes", bytes).add("iterations", graph.incrementIterations()).get();
 		col.save(pgraph);
 		
 	}
@@ -313,18 +309,36 @@ public class DatabaseManager {
 		BasicDBObject whereQuery = new BasicDBObject();
 		DBCursor cursor = col.find(whereQuery);
 		while(cursor.hasNext()) {
+			System.out.println("loading graph");
 		     o = cursor.next();
 		}
+		System.out.println("obj: " + o);
 		byte[] bytes = (byte[]) o.get("graphbytes");
+		System.out.print("bytes: " + bytes);
 		PageGraph g = null;
 		try {
 			g = (PageGraph) Marshaller.deserializeObject(bytes);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 		return g;
 	}
+	public byte[] loadGraphFromDB2() {
+		switchCollection(GRAPH_COL);
+		DBObject o = null;
+		BasicDBObject whereQuery = new BasicDBObject();
+		DBCursor cursor = col.find(whereQuery);
+		while(cursor.hasNext()) {
+			System.out.println("loading graph");
+		     o = cursor.next();
+		}
+		System.out.println("obj: " + o);
+		byte[] bytes = (byte[]) o.get("graphbytes");
+		System.out.print("bytes: " + bytes);
+		return bytes;
+	}
+	
+	
 	public boolean dropDocuments() {
 		switchCollection(DOC_COL);
 		BasicDBObject document = new BasicDBObject();
@@ -338,12 +352,14 @@ public class DatabaseManager {
 		return success;
 	}
 	
-	public ArrayList<HashMap<String, Float>> getAllPageRanks() {
-		PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
+	public ArrayList<HashMap<String, Float>> getAllPageRanks(PageGraph pg) {
 		ArrayList<Document> documents = getAllDocuments();
 		ArrayList<HashMap<String, Float>> documentsWithRank = new ArrayList<HashMap<String, Float>>();
 		Matrix prMatrix = PageRank2.computePageRank(pg.getGraph());
 		System.out.println("pagerank");
+		System.out.println(documents.size());
+		System.out.println(prMatrix.getColumnDimension());
+		System.out.println(prMatrix.getColumnDimension());
 		for (int i = 0; i < documents.size(); i++) {
 			HashMap map = new HashMap<String, Float>();
 			map.put(documents.get(i).getName(), (float) prMatrix.get(0, i));

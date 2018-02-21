@@ -13,7 +13,6 @@ import edu.carleton.comp4601.SDA.db.DatabaseManager;
 
 public class Crawler extends WebCrawler{
 
-	PageGraph pageGraph = new PageGraph();
 	
      public boolean shouldVisit(Page referringPage, WebURL url) {
     	//prevent off-site visits
@@ -40,6 +39,8 @@ public class Crawler extends WebCrawler{
          }
          else {
         	 Controller.pageGraph.addVertex(v);
-         }      
+         } 
+         
+         
      }
 }
