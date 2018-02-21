@@ -41,18 +41,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.xml.sax.SAXException;
-
-import edu.uci.ics.crawler4j.parser.HtmlParseData;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-
 import com.mongodb.MongoException;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-
-import com.mongodb.MongoException;
-
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.dao.DocumentCollection;
@@ -172,10 +161,55 @@ public class SDA {
 		if (!id.matches(regex)) {
 			return resetDocuments(id);
 		}
+		StringBuilder htmlBuilder = new StringBuilder();
+		Document doc = DatabaseManager.getInstance().getDocument(Integer.parseInt(id));
+		if (doc == null) {
+			return pageNotFound();
+		}
+		htmlBuilder.append("<html>");
+		htmlBuilder.append("<head><title>" + doc.getName() + "</title></head>");
+		htmlBuilder.append("<body><h1>" + doc.getName() + "</h1>");
+		htmlBuilder.append("<p>" + doc.getText() + "</p>");
+		htmlBuilder.append("<h1> Links </h1>");
+		htmlBuilder.append("<ul>");
+		for (String s : doc.getLinks())
+		{
+			htmlBuilder.append("<li>");
+			htmlBuilder.append("<a href=\"");
+			htmlBuilder.append(s);
+			htmlBuilder.append("\">");
+			htmlBuilder.append(s);
+			htmlBuilder.append("</a>");
+			htmlBuilder.append("</li>");
+		}
+		
+		htmlBuilder.append("</ul>");
+		htmlBuilder.append("<h1> Tags </h1>");
+		htmlBuilder.append("<ul>");
+		for (String s : doc.getTags())
+		{
+			htmlBuilder.append("<li>");
+			htmlBuilder.append(s);
+			htmlBuilder.append("</li>");
+		}
+		htmlBuilder.append("<h1>" + doc.getScore() + "</h1>");
+		htmlBuilder.append("</ul></body>");
+		htmlBuilder.append("</html>");
+		
+		return htmlBuilder.toString();		
+	}
+
+	@GET
+	@Path("{DOC_ID}")	
+	@Produces(MediaType.TEXT_XML)
+	public String getDocXml(@PathParam("DOC_ID") String id) {
+		String regex = "\\d+";
+		if (!id.matches(regex)) {
+			return resetDocuments(id);
+		}
 		Document doc = DatabaseManager.getInstance().getDocument(Integer.parseInt(id));
 		return "Name: " + doc.getName() + "\n Text: " + doc.getText() + "\n Links: " + doc.getLinks() + "\n Tags: " + doc.getTags();		
 	}
-	
 
 	
 	@DELETE
@@ -261,7 +295,7 @@ public class SDA {
 	}
 	private String resetDocuments(String path) {
 		if (!path.toLowerCase().equals("reset")) {
-			return Response.status(404).build().toString();
+			return pageNotFound();
 		}
 		DatabaseManager dbm = DatabaseManager.getInstance();
 		try {
@@ -271,7 +305,9 @@ public class SDA {
 		}
 		return "<html><head><title>Documents Dropped!</title></head></html>";
 	}
-
+	public String pageNotFound() {
+		return "<html><head><title>404: Resource not foudn</title></head><body><h1>404</h1> The page you are looking for does not exist</body></html>";
+	}
 	
 	@GET
 	@Path("pagerank")

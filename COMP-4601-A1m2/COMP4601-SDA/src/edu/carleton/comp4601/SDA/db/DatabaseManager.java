@@ -163,6 +163,9 @@ public class DatabaseManager {
 		if (cur.hasNext()) {
 			obj = cur.next();
 		}
+		if (obj == null) {
+			return null;
+		}
 		Document document = new Document();
 		document.setId((Integer) obj.get("id"));
 		document.setUrl( (String) obj.get("url"));
