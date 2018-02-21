@@ -2,9 +2,11 @@ package edu.carleton.comp4601.SDA.db;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import edu.carleton.comp4601.graph.*;
 import edu.carleton.comp4601.networking.Marshaller;
+import edu.carleton.comp4601.pagerank.PageRank2;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -14,6 +16,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
+import Jama.Matrix;
 import edu.carleton.comp4601.dao.Document;
 
 public class DatabaseManager {
@@ -31,12 +34,12 @@ public class DatabaseManager {
 	public DatabaseManager() {
 		instance = this;
 		initConnection();
-		
+
 	}
 
-	public boolean graphExists(String name) {
+	public boolean graphExists() {
 		switchCollection(GRAPH_COL);
-		DBCursor cur = col.find(new BasicDBObject("name", name)).limit(1);
+		DBCursor cur = col.find().limit(1);
 		if (cur.hasNext()) {
 			return true;
 		}
@@ -297,7 +300,7 @@ public class DatabaseManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		DBObject pgraph = BasicDBObjectBuilder.start().add("graphbytes", bytes).add("iterations", graph.incrementIterations()).add("name", graph.getName()).get();
+		DBObject pgraph = BasicDBObjectBuilder.start().add("graphbytes", bytes).add("iterations", graph.incrementIterations()).get();
 		col.save(pgraph);
 		
 	}
@@ -307,15 +310,62 @@ public class DatabaseManager {
 		BasicDBObject whereQuery = new BasicDBObject();
 		DBCursor cursor = col.find(whereQuery);
 		while(cursor.hasNext()) {
+			System.out.println("loading graph");
 		     o = cursor.next();
 		}
+		System.out.println("obj: " + o);
 		byte[] bytes = (byte[]) o.get("graphbytes");
+		System.out.print("bytes: " + bytes);
 		PageGraph g = null;
 		try {
 			g = (PageGraph) Marshaller.deserializeObject(bytes);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		return g;
+	}
+	public byte[] loadGraphFromDB2() {
+		switchCollection(GRAPH_COL);
+		DBObject o = null;
+		BasicDBObject whereQuery = new BasicDBObject();
+		DBCursor cursor = col.find(whereQuery);
+		while(cursor.hasNext()) {
+			System.out.println("loading graph");
+		     o = cursor.next();
+		}
+		System.out.println("obj: " + o);
+		byte[] bytes = (byte[]) o.get("graphbytes");
+		System.out.print("bytes: " + bytes);
+		return bytes;
+	}
+	
+	
+
+	public boolean dropDocuments() {
+		switchCollection(DOC_COL);
+		BasicDBObject document = new BasicDBObject();
+		col.remove(document);
+		DBCursor cursor = col.find();
+		boolean success = false;
+		while (cursor.hasNext()) {
+		    col.remove(cursor.next());
+		    success = true;
+		}
+		return success;
+	}
+	public ArrayList<HashMap<String, Float>> getAllPageRanks() {
+		PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
+		ArrayList<Document> documents = getAllDocuments();
+		ArrayList<HashMap<String, Float>> documentsWithRank = new ArrayList<HashMap<String, Float>>();
+		Matrix prMatrix = PageRank2.computePageRank(pg.getGraph());
+		System.out.println("pagerank");
+
+		for (int i = 0; i < documents.size(); i++) {
+			HashMap map = new HashMap<String, Float>();
+			map.put(documents.get(i).getName(), (float) prMatrix.get(0, i));
+			documentsWithRank.add(map);
+		}
+		return documentsWithRank;
 	}
 }
