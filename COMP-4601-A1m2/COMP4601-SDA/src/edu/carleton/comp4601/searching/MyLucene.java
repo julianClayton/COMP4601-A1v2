@@ -33,7 +33,7 @@ import edu.carleton.comp4601.SDA.db.DatabaseManager;
 
 public class MyLucene {
 	
-	private static final String INDEX_DIR = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Lucene";
+	private static final String INDEX_DIR = "Lucene";
 	
 	private static FSDirectory dir;
 	private static IndexWriter	writer;
