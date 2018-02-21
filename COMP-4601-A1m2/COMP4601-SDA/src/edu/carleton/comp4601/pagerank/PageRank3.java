@@ -3,6 +3,7 @@ import Jama.Matrix;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.graph.PageGraph;
+import edu.carleton.comp4601.graph.Vertex;
 import edu.carleton.comp4601.networking.Marshaller;
 
 import java.io.BufferedWriter;
@@ -12,7 +13,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
@@ -23,6 +26,9 @@ public class PageRank3 {
 	static Matrix pageRankMatrix;
 	private static PageRank3 instance;
 	private boolean rankComplete = false; 
+	private ArrayList<Vertex> vertexList;
+	private HashMap boostMap;
+	
 	PageGraph pg;
 	
 	public PageRank3() {
@@ -32,6 +38,8 @@ public class PageRank3 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		vertexList = new ArrayList<Vertex>();
+		boostMap = new HashMap<Integer, Integer>();
 	}
 	
 	public static PageRank3 getInstance() {
@@ -88,6 +96,7 @@ public class PageRank3 {
 	}
 	public  ArrayList<HashMap<String, Float>> computePageRank() {
 		Matrix adjacencyMatrix = generateAdjacencyMatrix(pg.getGraph());
+		Set<Vertex> vertexSet = pg.getGraph().vertexSet();
 		int size = adjacencyMatrix.getColumnDimension();
 		Matrix matrix = new Matrix(1, size);
 		matrix.set(0, 0, 1.0);
@@ -114,11 +123,12 @@ public class PageRank3 {
 		System.out.println("pagerank matrix");
 		pageRankMatrix.print(pageRankMatrix.getRowDimension(), pageRankMatrix.getColumnDimension());
 		for (int i = 0; i < documents.size(); i++) {
+			System.out.println("PUTTING " + vertexList.get(i).getID());
 			HashMap map = new HashMap<String, Float>();
 			map.put(documents.get(i).getName(), (float) pageRankMatrix.get(0, i));
-			documentsWithRank.add(map);
+			boostMap.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
 		}
-		
+
 		return documentsWithRank;
 
 	}
@@ -132,9 +142,12 @@ public class PageRank3 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("GRAPH");
-		//System.out.println(g.toString());
-
+		
+		
+		Set vertexSet = g.vertexSet();
+		vertexList = new ArrayList(vertexSet);
+		System.out.println("Size of vertex set: " + vertexList.size());
+		
 		csvExporter.exportGraph(g, writer);
 		
 		String thisLine; 
@@ -170,6 +183,12 @@ public class PageRank3 {
 		Matrix matrix = new Matrix(doubleArray);
 		return matrix;
 	}
+	
+	public HashMap<Integer, Float> generateBoostMap() {
+		
+		
+		return new HashMap<Integer, Float>();
+	}
 	public static void main(String[] args) {
 		Graph<String, DefaultEdge> g = new SimpleDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
 		double[][] array = {{1.,1.,0},{1.,1.,1.},{0.,1.,0.}};
@@ -194,6 +213,9 @@ public class PageRank3 {
         //Matrix Pr = computePageRank(g);
         //Pr.print(Pr.getRowDimension(), Pr.getColumnDimension());
        // Pr.print(Pr.getRowDimension(), Pr.getColumnDimension());
+	}
+	public HashMap<Integer, Integer> getBoostMap() {
+		return boostMap;
 	}
 
 }

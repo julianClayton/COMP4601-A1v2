@@ -36,7 +36,7 @@ public class Controller {
 
         config.setCrawlStorageFolder(crawlStorageFolder);
         
-        config.setMaxPagesToFetch(5);
+        config.setMaxPagesToFetch(4);
 
         config.setPolitenessDelay(1000);
 
@@ -73,7 +73,7 @@ public class Controller {
         m.print(m.getRowDimension(), m.getColumnDimension());*/
         ///PageRank2.computePageRank(pageGraph.getGraph());
         ArrayList<HashMap<String, Float>> pr = PageRank3.getInstance().computePageRank();
-
+        System.out.println(PageRank3.getInstance().getBoostMap());
 
     }
 }
