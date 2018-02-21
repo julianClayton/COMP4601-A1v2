@@ -48,6 +48,11 @@ import org.apache.commons.lang.math.NumberUtils;
 
 import com.mongodb.MongoException;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+
+import com.mongodb.MongoException;
+
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.dao.DocumentCollection;
@@ -266,6 +271,7 @@ public class SDA {
 		}
 		return "<html><head><title>Documents Dropped!</title></head></html>";
 	}
+
 	
 	@GET
 	@Path("pagerank")
@@ -275,7 +281,7 @@ public class SDA {
 		PageGraph pg = new PageGraph();
 		Vertex vertex = new Vertex("", new Page(null));
 		Page page = new Page(null);
-		dbm.getAllPageRanks(pg);
+		dbm.getAllPageRanks();
 		//ArrayList<HashMap<String, Float>> documents = dbm.getAllPageRanks();
 		/*for (HashMap doc : documents) {
 			System.out.println(doc.keySet());

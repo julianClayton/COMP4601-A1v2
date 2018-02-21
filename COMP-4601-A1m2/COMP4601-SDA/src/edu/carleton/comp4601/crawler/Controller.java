@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Jama.Matrix;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.graph.PageGraph;
 import edu.carleton.comp4601.searching.MyLucene;
 import edu.carleton.comp4601.pagerank.PageRank2;
 import edu.carleton.comp4601.networking.Marshaller;
 import edu.carleton.comp4601.pagerank.PageRank3;
+import edu.carleton.comp4601.pagerank.PageRank2;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -71,6 +73,7 @@ public class Controller {
         m.print(m.getRowDimension(), m.getColumnDimension());*/
         ///PageRank2.computePageRank(pageGraph.getGraph());
         ArrayList<HashMap<String, Float>> pr = PageRank3.getInstance().computePageRank();
- 
+
+
     }
 }

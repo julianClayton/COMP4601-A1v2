@@ -39,8 +39,7 @@ public class Crawler extends WebCrawler{
          }
          else {
         	 Controller.pageGraph.addVertex(v);
-         } 
-         
-         
+           
+         }      
      }
 }

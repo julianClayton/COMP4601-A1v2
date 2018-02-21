@@ -34,6 +34,7 @@ public class DatabaseManager {
 	public DatabaseManager() {
 		instance = this;
 		initConnection();
+
 	}
 
 	public boolean graphExists() {
@@ -321,6 +322,7 @@ public class DatabaseManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		return g;
 	}
 	public byte[] loadGraphFromDB2() {
@@ -339,6 +341,7 @@ public class DatabaseManager {
 	}
 	
 	
+
 	public boolean dropDocuments() {
 		switchCollection(DOC_COL);
 		BasicDBObject document = new BasicDBObject();
@@ -351,15 +354,13 @@ public class DatabaseManager {
 		}
 		return success;
 	}
-	
-	public ArrayList<HashMap<String, Float>> getAllPageRanks(PageGraph pg) {
+	public ArrayList<HashMap<String, Float>> getAllPageRanks() {
+		PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
 		ArrayList<Document> documents = getAllDocuments();
 		ArrayList<HashMap<String, Float>> documentsWithRank = new ArrayList<HashMap<String, Float>>();
 		Matrix prMatrix = PageRank2.computePageRank(pg.getGraph());
 		System.out.println("pagerank");
-		System.out.println(documents.size());
-		System.out.println(prMatrix.getColumnDimension());
-		System.out.println(prMatrix.getColumnDimension());
+
 		for (int i = 0; i < documents.size(); i++) {
 			HashMap map = new HashMap<String, Float>();
 			map.put(documents.get(i).getName(), (float) prMatrix.get(0, i));

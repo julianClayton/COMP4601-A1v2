@@ -93,9 +93,6 @@ public class PageRank2 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("GRAPH");
-		//System.out.println(g.toString());
-
 		csvExporter.exportGraph(g, writer);
 		
 		String thisLine; 
