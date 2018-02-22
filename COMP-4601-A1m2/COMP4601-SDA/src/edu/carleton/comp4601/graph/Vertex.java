@@ -29,7 +29,6 @@ public class Vertex implements Serializable {
 	private String url;
 	private int docID;
 	private Vertex parent;
-	private HashSet<Vertex> children;
 	private Page page;
 	
 	private edu.carleton.comp4601.dao.Document SDAdoc;
@@ -64,6 +63,7 @@ public class Vertex implements Serializable {
 		
 	}
 	public Vertex(String url, Page page){
+		this.docID =  page.getWebURL().getDocid();
 		this.SDAdoc = new edu.carleton.comp4601.dao.Document();
 		timestamp = new Date();
 		this.url = url;
@@ -115,6 +115,7 @@ public class Vertex implements Serializable {
 		SDAdoc.setUrl(this.url);
 	}
 	
+	
 	private void parseJsoup() {
 		if ((page.getParseData() instanceof HtmlParseData)) {
         HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
@@ -135,6 +136,7 @@ public class Vertex implements Serializable {
 	        SDAdoc.setLinks(links);
 
 	        System.out.println("=====JSOUP PARSED DATA======");
+	        System.out.println("ID: " + this.docID);
 	       	System.out.println("Text:" + text.toString());
 	       	System.out.println("Images + Alts:" + imgAltMap.toString());
 	       	System.out.println("Header:" + headings.toString());
@@ -175,7 +177,6 @@ public class Vertex implements Serializable {
 	  		SDAdoc.setName(title);
 	  	}
 	}
-	
 	
 	private HashMap<String, String> getImgAlts(Document doc){
 		HashMap<String, String> hm = new HashMap<String, String>();

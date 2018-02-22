@@ -263,7 +263,7 @@ public class SDA {
 	    docs.setDocuments(queryDocs);
 	    String htmlList = "<ul>";
 		for (Document doc : queryDocs) {
-			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
+			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() + " Score: " + doc.getScore() +" </a>";
 			htmlList = htmlList +  "<li>" + link + "</li>";
 		}
 		htmlList = htmlList + "</ul>";

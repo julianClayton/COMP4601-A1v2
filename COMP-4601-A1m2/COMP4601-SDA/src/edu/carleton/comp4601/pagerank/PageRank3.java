@@ -39,7 +39,7 @@ public class PageRank3 {
 			e.printStackTrace();
 		}
 		vertexList = new ArrayList<Vertex>();
-		boostMap = new HashMap<Integer, Integer>();
+		boostMap = new HashMap<Integer, Float>();
 	}
 	
 	public static PageRank3 getInstance() {
@@ -214,7 +214,7 @@ public class PageRank3 {
         //Pr.print(Pr.getRowDimension(), Pr.getColumnDimension());
        // Pr.print(Pr.getRowDimension(), Pr.getColumnDimension());
 	}
-	public HashMap<Integer, Integer> getBoostMap() {
+	public HashMap<Integer, Float> getBoostMap() {
 		return boostMap;
 	}
 
