@@ -35,7 +35,7 @@ import edu.carleton.comp4601.SDA.db.DatabaseManager;
 
 public class MyLucene {
 	
-	private static final String INDEX_DIR = "Lucene";
+	private static final String INDEX_DIR = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Lucene";
 	
 	private static FSDirectory dir;
 	private static IndexWriter	writer;
@@ -136,7 +136,10 @@ public class MyLucene {
 		}
 		
 		
-		private static void boostADoc(DBObject object, HashMap<Integer, Float> hm) throws IOException	{	
+		
+		
+		
+private static void boostADoc(DBObject object, HashMap<Integer, Float> hm) throws IOException	{	
 			
 			try{
 				Document lucDoc	=	new	Document();	
@@ -148,11 +151,11 @@ public class MyLucene {
 				FieldType myStringType = new FieldType(StringField.TYPE_STORED);
 				myStringType.setOmitNorms(false);
 
-				Field docId = new Field(CONTENT, object.get("id").toString(), myStringType);
-				Field url = new Field(CONTENT, object.get("url").toString(),  myStringType);
+				Field docId = new Field(DOC_ID, object.get("id").toString(), myStringType);
+				Field url = new Field(URL, object.get("url").toString(),  myStringType);
 				TextField content = new TextField(CONTENT, (String)object.get("text"), Field.Store.YES);
-				Field metadata = new Field(CONTENT, object.get("metadata").toString(),  myStringType);
-				Field ts = new Field(CONTENT, object.get("timestamp").toString(),  myStringType);
+				Field metadata = new Field(METADATA, object.get("metadata").toString(),  myStringType);
+				Field ts = new Field(DATE, object.get("timestamp").toString(),  myStringType);
 				
 				//System.out.println("Id" + docId + "\nurl: " + url + "\ntext " + content + "\ntype:'" + metadata + "\ndate:" + ts);
 				
@@ -170,7 +173,8 @@ public class MyLucene {
 				lucDoc.add(metadata);
 				lucDoc.add(ts);
 		
-				writer.addDocument(lucDoc);
+			    Term term = new Term("id", (object.get("id").toString()));
+				writer.updateDocument(term, lucDoc);
 				
 			}catch(Exception e){
 				System.out.println("-------Error:  " + e);	
