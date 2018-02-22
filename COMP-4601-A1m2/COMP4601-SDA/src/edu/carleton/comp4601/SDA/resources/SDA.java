@@ -141,17 +141,6 @@ public class SDA {
 		}
 		return Response.ok().build();
 	}
-
-	@GET
-	@Path("/reset")
-	@Produces(MediaType.TEXT_HTML)
-	public String reset() {
-		boolean reset = DatabaseManager.getInstance().deleteAllDocuments();
-		if (reset){
-			return "All documents reset";
-		}
-		return "ERROR: could not remove docs";
-	}
 	
 	@GET
 	@Path("{DOC_ID}")	
@@ -253,6 +242,7 @@ public class SDA {
 		htmlList = htmlList + "</ul>";
 		return "<html><head><title>Document List</title></head><body><h1>Documents with tag(s) " + titleString + "</h1>" + htmlList +"</body></html>";
 	}
+	
 
 	@GET 
 	@Path("query/{TERMS}")
@@ -293,6 +283,17 @@ public class SDA {
 		String sr = ServiceRegistrar.list();
 		return sr;
 	}
+	
+	@GET
+	@Path("noboost")
+	@Produces(MediaType.TEXT_HTML)
+	public String resetBoost() {
+		 //ArrayList<Document> queryDocs = MyLucene.query(terms);
+		Float boost = 1.0f; 
+		MyLucene.resetBoostLucene(DatabaseManager.getInstance().getAllDocCursor(), boost);
+		return "Boost reset";
+	}
+	
 	private String resetDocuments(String path) {
 		if (!path.toLowerCase().equals("reset")) {
 			return pageNotFound();
