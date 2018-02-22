@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.jgrapht.*;
+import org.jgrapht.generate.GraphGenerator;
 import org.jgrapht.graph.*;
 import org.jgrapht.io.*;
 
@@ -34,10 +35,12 @@ public class PageRank3 {
 	public PageRank3() {
 		instance= this;
 		try {
-			pg = (PageGraph) Marshaller.deserializeObject(DatabaseManager.getInstance().loadGraphFromDB2());
+			pg = (PageGraph) Marshaller.deserializeObject(DatabaseManager.getInstance().getGraphData());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		
 		vertexList = new ArrayList<Vertex>();
 		boostMap = new HashMap<Integer, Float>();
 	}
@@ -94,7 +97,8 @@ public class PageRank3 {
 
 		return result;
 	}
-	public  ArrayList<HashMap<String, Float>> computePageRank() {
+	public  ArrayList<HashMap<Integer, Float>> computePageRank() {
+		
 		Matrix adjacencyMatrix = generateAdjacencyMatrix(pg.getGraph());
 		Set<Vertex> vertexSet = pg.getGraph().vertexSet();
 		int size = adjacencyMatrix.getColumnDimension();
@@ -119,16 +123,15 @@ public class PageRank3 {
 		
 		
 		ArrayList<Document> documents = DatabaseManager.getInstance().getAllDocuments();
-		ArrayList<HashMap<String, Float>> documentsWithRank = new ArrayList<HashMap<String, Float>>();
-		System.out.println("pagerank matrix");
+		ArrayList<HashMap<Integer, Float>> documentsWithRank = new ArrayList<HashMap<Integer, Float>>();
 		pageRankMatrix.print(pageRankMatrix.getRowDimension(), pageRankMatrix.getColumnDimension());
 		for (int i = 0; i < documents.size(); i++) {
-			System.out.println("PUTTING " + vertexList.get(i).getID());
-			HashMap map = new HashMap<String, Float>();
-			map.put(documents.get(i).getName(), (float) pageRankMatrix.get(0, i));
+			HashMap map = new HashMap<Integer, Float>();
+			map.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
 			boostMap.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
+			map.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
+			documentsWithRank.add(map);
 		}
-
 		return documentsWithRank;
 
 	}
@@ -213,6 +216,17 @@ public class PageRank3 {
         //Matrix Pr = computePageRank(g);
         //Pr.print(Pr.getRowDimension(), Pr.getColumnDimension());
        // Pr.print(Pr.getRowDimension(), Pr.getColumnDimension());
+        
+    	PageGraph graph = null;
+		try {
+			graph = (PageGraph) Marshaller.deserializeObject(DatabaseManager.getInstance().getGraphData());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        System.out.println(graph.getGraph());
+        
+        getInstance().computePageRank();
 	}
 	public HashMap<Integer, Float> getBoostMap() {
 		return boostMap;

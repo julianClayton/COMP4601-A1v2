@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.jgrapht.Graph;
+
 import Jama.Matrix;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.graph.PageGraph;
@@ -23,7 +25,7 @@ public class Controller {
 	
 	public static ArrayList<String> urls = new ArrayList<String>();
 	
-	static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
+	//static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
 	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/N-0";
 	static final public String SEED3 = "https://www.reddit.com/";
 	public static PageGraph pageGraph;
@@ -37,7 +39,7 @@ public class Controller {
 
         config.setCrawlStorageFolder(crawlStorageFolder);
         
-        config.setMaxPagesToFetch(4);
+        config.setMaxPagesToFetch(6);
 
 
         config.setPolitenessDelay(1000);
@@ -53,47 +55,15 @@ public class Controller {
         
         CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
 
-        controller.addSeed(SEED1);
+        //controller.addSeed(SEED1);
         controller.addSeed(SEED2);
-        controller.addSeed(SEED3);
+        //controller.addSeed(SEED3);
        
         controller.start(Crawler.class, numCrawlers);
         
-        DatabaseManager.getInstance().addGraphToDb(pageGraph);
-        PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
-        System.out.println(pg.getGraph().toString());;
-        
-        
+
+        byte[] bytes = Marshaller.serializeObject(pageGraph);
+        DatabaseManager.getInstance().addNewGraph(bytes);
         MyLucene.indexLucene(DatabaseManager.getInstance().getAllDocCursor());
-        
-        System.out.print("Results: " + MyLucene.query("+banana +coconut").toString());
-   
-
-        //DatabaseManager.getInstance().addGraphToDb(pageGraph);
-        /*PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
-        Matrix m = PageRank2.computePageRank(pg.getGraph());
-        m.print(m.getRowDimension(), m.getColumnDimension());*/
-        ///PageRank2.computePageRank(pageGraph.getGraph());
-        ArrayList<HashMap<String, Float>> pr = PageRank3.getInstance().computePageRank();
-        System.out.println(PageRank3.getInstance().getBoostMap());
-        System.out.println("\nResults FIRST: " + MyLucene.query("+banana").toString());
-        
-        //DatabaseManager.getInstance().addGraphToDb(pageGraph);
-        //PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
-       // Matrix m = PageRank2.computePageRank(pg.getGraph());
-       // m.print(m.getRowDimension(), m.getColumnDimension());
-        ///PageRank2.computePageRank(pageGraph.getGraph());
-        System.out.println(PageRank3.getInstance().getBoostMap());
-        
-        HashMap <Integer, Float> boostMap = PageRank3.getInstance().getBoostMap();
-
-        MyLucene.reindexLucene(DatabaseManager.getInstance().getAllDocCursor(), boostMap);
-        
-        System.out.println("Results after boost: " + MyLucene.query("+banana").toString());
-        
-        //MyLucene.indexLucene(DatabaseManager.getInstance().getAllDocCursor());
-        
-        //System.out.println("\nResults AGAIN: " + MyLucene.query("+banana").toString());
-
     }
 }

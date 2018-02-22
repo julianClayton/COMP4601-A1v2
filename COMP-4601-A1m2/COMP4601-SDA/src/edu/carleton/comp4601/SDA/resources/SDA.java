@@ -1,5 +1,5 @@
 package edu.carleton.comp4601.SDA.resources;
-
+import java.io.Serializable;
 import java.awt.List;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -59,7 +59,7 @@ import edu.uci.ics.crawler4j.crawler.Page;
 
 
 @Path("sda")
-public class SDA {
+public class SDA implements Serializable {
 	@Context
 	UriInfo uriInfo;
 	@Context
@@ -309,68 +309,43 @@ public class SDA {
 		return "<html><head><title>404: Resource not foudn</title></head><body><h1>404</h1> The page you are looking for does not exist</body></html>";
 	}
 	
+	
+	
 	@GET
 	@Path("pagerank")
 	@Produces(MediaType.TEXT_HTML)
-	public String getDocPageRanks() {
-		DatabaseManager dbm = DatabaseManager.getInstance();
-		PageGraph pg = new PageGraph();
-		Vertex vertex = new Vertex("", new Page(null));
-		Page page = new Page(null);
-		dbm.getAllPageRanks();
-		//ArrayList<HashMap<String, Float>> documents = dbm.getAllPageRanks();
-		/*for (HashMap doc : documents) {
-			System.out.println(doc.keySet());
-			System.out.println(doc.values());
-		}*/
+	public String getGraph2()  {
+        ArrayList<HashMap<String, Float>> pr = PageRank3.getInstance().computePageRank();
+		ArrayList<HashMap<String, Float>> docsWithRank = PageRank3.getInstance().computePageRank();
 		
-		return "";
-	}
-	
-	@GET
-	@Path("graph")
-	@Produces(MediaType.TEXT_HTML)
-	public String getGraph() {
-		PageGraph pg = new PageGraph();
-		Vertex vertex = new Vertex("", new Page(null));
-		Page page = new Page(null);
-		Graph directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
-	  	java.io.InputStream	input;	
-	  	org.apache.tika.metadata.Metadata	metadata	=	new org.apache.tika.metadata.Metadata();
-	  	ParseContext	context	=	new ParseContext();	
-	  	Parser	parser	=	new AutoDetectParser();
-		DatabaseManager dbm = DatabaseManager.getInstance();
-		byte[] b = dbm.loadGraphFromDB2();
-		pg = null;
-		try {
-			pg = (PageGraph) Marshaller.deserializeObject(b);
-		} catch (IOException e) {
-			e.printStackTrace();
+		StringBuilder htmlBuilder = new StringBuilder();
+		htmlBuilder.append("<html>");
+		htmlBuilder.append("<head><title> Document Page Ranks </title></head>");
+		htmlBuilder.append("<body>");
+		htmlBuilder.append("<table style=\"width:100%\">");	
+		System.out.println(docsWithRank.size());
+		for(HashMap map : docsWithRank) {
+			System.out.println("loop");
+			htmlBuilder.append("<tr>");
+			htmlBuilder.append("<td>" + map.keySet() + "</td>");
+			htmlBuilder.append("<td>" + map.values() + "</td>");
+			htmlBuilder.append("</tr>");
 		}
-		System.out.println(pg.getName());
-		System.out.println(pg.getGraph());
-		return pg.getGraph().toString();
-	}
-	@GET
-	@Path("pagerank2")
-	@Produces(MediaType.TEXT_HTML)
-	public String getGraph2() {
-		//PageGraph pg = new PageGraph();
-		//Vertex vertex = new Vertex("", new Page(null));
-		//Page page = new Page(null);
-		//Graph directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
-	  	java.io.InputStream	input;	
-	  	org.apache.tika.metadata.Metadata	metadata	=	new org.apache.tika.metadata.Metadata();
-	  	ParseContext	context	=	new ParseContext();	
-	  	Parser	parser	=	new AutoDetectParser();
-		DatabaseManager dbm = DatabaseManager.getInstance();
+		htmlBuilder.append("</table>");
+		htmlBuilder.append("</body>");
+		htmlBuilder.append("</html>");		
 		
-		ArrayList<HashMap<String, Float>> psg = PageRank3.getInstance().computePageRank();
-		return "";
+		
+		
+		return htmlBuilder.toString();
 	}
 	
-	public String sayXML() {
-		return "<?xml version=\"1.0\"?>" + "<bank> " + name + " </bank>";
+	
+	private void initGraphObjects() {
+		Vertex vertex = new Vertex();
+		Page page = new Page(null);
+		DefaultEdge e = new DefaultEdge();
+		Graph directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
 	}
 }
 

@@ -1,35 +1,25 @@
 package edu.carleton.comp4601.graph;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.BodyContentHandler;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.xml.sax.SAXException;
 
 
-import edu.uci.ics.crawler4j.crawler.Page;
+
+
+
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 
 public class Vertex implements Serializable {
 	
-	private static final long serialVersionUID = 1L;
+
+	private static final long serialVersionUID = 7257935563978205706L;
 	private String url;
 	private int docID;
 	private Vertex parent;
-	private Page page;
+	//private Page page;
 	
 	private edu.carleton.comp4601.dao.Document SDAdoc;
 	
@@ -42,37 +32,40 @@ public class Vertex implements Serializable {
 	
 	private String title;
 	private String type;
-	
-	public Vertex(Vertex parent, String url, Page page){
+	public Vertex() {}
+	/*public Vertex(Vertex parent, String url, Page page){
 		this.docID =  page.getWebURL().getDocid();
 		
 		timestamp = new Date();
 		
-		this.SDAdoc = new edu.carleton.comp4601.dao.Document();
+		//this.SDAdoc = new edu.carleton.comp4601.dao.Document();
 		this.url = url;
-		this.page = page;
+		//this.page = page;
 		this.parent = parent;
 		setSDAdoc();
-		parseJsoup();
-		parseTika();
-	}
+		//parseJsoup();
+		//parseTika();
+	}*/
 	//This is the constructor for the initial base vertexs
 	public Vertex(Vertex parent, String url) {
 		this.parent = parent;
 		this.url = url;
 		
 	}
-	public Vertex(String url, Page page){
+	public Vertex(String url) {
+		this.url = url;
+	}
+	/*public Vertex(String url, Page page){
 		this.docID =  page.getWebURL().getDocid();
-		this.SDAdoc = new edu.carleton.comp4601.dao.Document();
+		//this.SDAdoc = new edu.carleton.comp4601.dao.Document();
 		timestamp = new Date();
 		this.url = url;
-		this.page = page;
+		//this.page = page;
 		this.parent = null;
 		setSDAdoc();
-		parseJsoup();
-		parseTika();
-	}
+		//parseJsoup();
+		//parseTika();
+	}*/
 	
 	public edu.carleton.comp4601.dao.Document getDoc(){
 		return this.SDAdoc;
@@ -111,12 +104,12 @@ public class Vertex implements Serializable {
 	}
 	
 	private void setSDAdoc(){
-		SDAdoc.setId(this.docID);
-		SDAdoc.setUrl(this.url);
+		//SDAdoc.setId(this.docID);
+		//SDAdoc.setUrl(this.url);
 	}
 	
 	
-	private void parseJsoup() {
+	/*private void parseJsoup() {
 		if ((page.getParseData() instanceof HtmlParseData)) {
         HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
         String html = htmlParseData.getHtml();
@@ -131,9 +124,9 @@ public class Vertex implements Serializable {
 	        this.links = elementToList(jdoc.select("a[href]")); 
 	        this.imgAltMap = getImgAlts(jdoc);
 	        
-	        SDAdoc.setText(this.text);
-	        SDAdoc.setName(jdoc.select("h0").toString());
-	        SDAdoc.setLinks(links);
+	        //SDAdoc.setText(this.text);
+	        //SDAdoc.setName(jdoc.select("h0").toString());
+	        //SDAdoc.setLinks(links);
 
 	        System.out.println("=====JSOUP PARSED DATA======");
 	        System.out.println("ID: " + this.docID);
@@ -143,11 +136,11 @@ public class Vertex implements Serializable {
 	       	System.out.println("Links:" + links.toString());
 		}
 
-	}
+	}*/
 	
-	private void parseTika() {
+	/*private void parseTika() {
        	//Parse metadata with Tika
-	  	java.io.InputStream	input	= new ByteArrayInputStream(page.getContentData());	
+	  	//java.io.InputStream	input	= new ByteArrayInputStream(page.getContentData());	
 	  	org.xml.sax.ContentHandler	handler	= new BodyContentHandler();
 	  	org.apache.tika.metadata.Metadata	metadata	=	new org.apache.tika.metadata.Metadata();
 	  	ParseContext	context	=	new ParseContext();	
@@ -171,14 +164,14 @@ public class Vertex implements Serializable {
 	  	System.out.println("TYPE : " + type);
 	  	
 	  	
-	  	SDAdoc.setName(title);
+	  	//SDAdoc.setName(title);
 	  	if (type != "text/html"){
-	  		SDAdoc.setText(handler.toString());
-	  		SDAdoc.setName(title);
+	  		//SDAdoc.setText(handler.toString());
+	  		//SDAdoc.setName(title);
 	  	}
-	}
+	}*/
 	
-	private HashMap<String, String> getImgAlts(Document doc){
+	/*private HashMap<String, String> getImgAlts(Document doc){
 		HashMap<String, String> hm = new HashMap<String, String>();
 	
 		Elements images = doc.select("img[src~=(?i)\\.(png|jpe?g|gif)]");
@@ -189,14 +182,14 @@ public class Vertex implements Serializable {
 			}
 		}
 		return hm;
-	}
+	}*/
 	
-	private ArrayList<String> elementToList(Elements el){
+	/*private ArrayList<String> elementToList(Elements el){
 		ArrayList<String> al = new ArrayList<String>();
 		for	(Element	e	:	el)	{	
       		 al.add(e.text());
         }	
 		return al;
-	}
+	}*/
 
 }

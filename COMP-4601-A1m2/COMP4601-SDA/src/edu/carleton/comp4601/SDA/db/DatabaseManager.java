@@ -3,10 +3,15 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
 
 import edu.carleton.comp4601.graph.*;
 import edu.carleton.comp4601.networking.Marshaller;
 import edu.carleton.comp4601.pagerank.PageRank2;
+import edu.carleton.comp4601.pagerank.PageRank3;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -15,6 +20,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
 
 import Jama.Matrix;
 import edu.carleton.comp4601.dao.Document;
@@ -289,62 +295,36 @@ public class DatabaseManager {
 	private void switchCollection(String collection) {
 		col = db.getCollection(collection);
 	}
-	public void removeOldGraph(PageGraph graph) {
+	public void removeOldGraph() {
 		switchCollection(GRAPH_COL);
-		col.remove(new BasicDBObject("name", graph.getName()));
-	}
-	
-	public void addGraphToDb(PageGraph graph) {
-		switchCollection(GRAPH_COL);
-		removeOldGraph(graph);
-		byte[] bytes = null;
-		try {
-			bytes = Marshaller.serializeObject(graph);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		DBObject pgraph = BasicDBObjectBuilder.start().add("graphbytes", bytes).add("iterations", graph.incrementIterations()).get();
-		col.save(pgraph);
-		
-	}
-	public PageGraph loadGraphFromDB() {
-		switchCollection(GRAPH_COL);
+		DBCursor cur = col.find().limit(1);
 		DBObject o = null;
-		BasicDBObject whereQuery = new BasicDBObject();
-		DBCursor cursor = col.find(whereQuery);
-		while(cursor.hasNext()) {
+		while(cur.hasNext()) {
 			System.out.println("loading graph");
-		     o = cursor.next();
+		    o = cur.next();
 		}
-		System.out.println("obj: " + o);
-		byte[] bytes = (byte[]) o.get("graphbytes");
-		System.out.print("bytes: " + bytes);
-		PageGraph g = null;
-		try {
-			g = (PageGraph) Marshaller.deserializeObject(bytes);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return g;
-	}
-	public byte[] loadGraphFromDB2() {
-		switchCollection(GRAPH_COL);
-		DBObject o = null;
-		BasicDBObject whereQuery = new BasicDBObject();
-		DBCursor cursor = col.find(whereQuery);
-		while(cursor.hasNext()) {
-			System.out.println("loading graph");
-		     o = cursor.next();
-		}
-		System.out.println("obj: " + o);
-		byte[] bytes = (byte[]) o.get("graphbytes");
-		System.out.print("bytes: " + bytes);
-		return bytes;
+		col.remove(o);
 	}
 	
-	
+	public synchronized byte[] getGraphData() {
 
+		try {
+			BasicDBObject query = new BasicDBObject("name", "test");
+			switchCollection(GRAPH_COL);
+			DBObject result = col.findOne(query);
+
+			if(result != null) {
+				Map<?, ?> graphMap = result.toMap();
+				byte[] bytes = (byte[]) graphMap.get("bytes");	
+				return bytes;
+			}
+
+			return null;
+		} catch (MongoException e) {
+			System.out.println("MongoException: " + e.getLocalizedMessage());
+			return null;
+		}
+	}
 	public boolean dropDocuments() {
 		switchCollection(DOC_COL);
 		BasicDBObject document = new BasicDBObject();
@@ -358,17 +338,25 @@ public class DatabaseManager {
 		return success;
 	}
 	public ArrayList<HashMap<String, Float>> getAllPageRanks() {
-		PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
-		ArrayList<Document> documents = getAllDocuments();
-		ArrayList<HashMap<String, Float>> documentsWithRank = new ArrayList<HashMap<String, Float>>();
-		Matrix prMatrix = PageRank2.computePageRank(pg.getGraph());
-		System.out.println("pagerank");
-
-		for (int i = 0; i < documents.size(); i++) {
-			HashMap map = new HashMap<String, Float>();
-			map.put(documents.get(i).getName(), (float) prMatrix.get(0, i));
-			documentsWithRank.add(map);
-		}
-		return documentsWithRank;
+		
+		ArrayList<HashMap<String, Float>> docsWithRank = PageRank3.getInstance().computePageRank();
+		
+		
+		return docsWithRank;
 	}
+	public synchronized boolean addNewGraph(byte[] graph) {
+		removeOldGraph(); 
+		try {
+			switchCollection(GRAPH_COL);
+			BasicDBObject obj = new BasicDBObject();
+			obj.put("name", "test");
+			obj.put("bytes", graph);
+			col.insert(obj);
+		} catch (MongoException e) {
+			System.out.println("MongoException: " + e.getLocalizedMessage());
+			return false;
+		}
+		
+		return true;
+}
 }
