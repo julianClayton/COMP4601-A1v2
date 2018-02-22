@@ -42,24 +42,28 @@ public class Crawler extends WebCrawler{
          
          int delay = this.getMyController().getConfig().getPolitenessDelay();
  	     
-         long time = startTime.getTime() - endTime.getTime();
+         //long time = startTime.getTime() - endTime.getTime();
          
-         System.out.println("Current delay: " + delay);
+         /*System.out.println("Current delay: " + delay);
          if (delay > time){
         	 System.out.println("Setting delay: " + time);
         	 this.getMyController().getConfig().setPolitenessDelay(delay*(int)time);
-         }
+         }*/
          
-         Vertex v = new Vertex (url, page);
          
+         Vertex v = new Vertex(docID, url);
+         
+         PageParser p = new PageParser(url, page);
+         
+        
          DatabaseManager dm = DatabaseManager.getInstance();
-         dm.addVertexToDb(v);
+         dm.addPageToDb(p);
          if (Controller.pageGraph.hasVertex(parentUrl)) {
         	 Controller.pageGraph.connectToExistingVertex(v, parentUrl);
          }
          else {
         	 Controller.pageGraph.addVertex(v);
-           
-         }      
-     }
-}
+          }      
+     }    
+} 
+    

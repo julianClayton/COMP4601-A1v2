@@ -2,6 +2,7 @@ package edu.carleton.comp4601.graph;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -14,22 +15,20 @@ public class PageGraph implements Serializable{
 
 	private final String BASE_VERTEX_KEY = "BASE";
 	private  String baseUrl;
-	private static Graph<Vertex, DefaultEdge> directedGraph;
-	private static HashMap<String, Vertex> vertexMap;
-	private String name;
-	private int iterations;
+	private  Graph<Vertex, DefaultEdge> directedGraph;
+	private  ConcurrentHashMap<String, Vertex> vertexMap;
+	private String name; 
 	
 	public PageGraph(String baseUrl, String name) {
 		directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
-		vertexMap = new HashMap<String, Vertex>();
-		vertexMap.put(BASE_VERTEX_KEY, new Vertex(null, BASE_VERTEX_KEY));
+		vertexMap = new ConcurrentHashMap<String, Vertex>();
+		vertexMap.put(BASE_VERTEX_KEY, new Vertex(-1, BASE_VERTEX_KEY));
+
 		this.baseUrl = baseUrl;
-		this.name = name;
-		iterations = 0;
 	}
 	public PageGraph() {
 		directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
-		vertexMap = new HashMap<String, Vertex>();
+		vertexMap = new ConcurrentHashMap<String, Vertex>();
 
 	}
 	
@@ -62,6 +61,9 @@ public class PageGraph implements Serializable{
 		Vertex vertex = vertexMap.get(url);
 		return vertex;
 	}
+	public String getName() {
+		return name;
+	}
 	public synchronized boolean hasVertex(String url) {
 		if (vertexMap.containsKey(url)) {
 			return true;
@@ -71,14 +73,8 @@ public class PageGraph implements Serializable{
 	public String getGraphUrl() {
 		return baseUrl;
 	}
-	public String getName() {
-		return name;
-	}
 	public Graph<Vertex, DefaultEdge> getGraph() {
 		return directedGraph;
 	}
-	public int incrementIterations() {
-		iterations++;
-		return iterations;
-	}
+
 }

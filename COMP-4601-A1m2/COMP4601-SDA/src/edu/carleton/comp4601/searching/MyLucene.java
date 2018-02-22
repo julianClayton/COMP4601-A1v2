@@ -114,8 +114,10 @@ public class MyLucene {
 			iwc.setOpenMode(OpenMode.CREATE);	
 			writer = new IndexWriter(dir, iwc);	
 			
-			while(cursor.hasNext()){	
-				boostADoc(cursor.next(), hm);	
+			while(cursor.hasNext()){				
+			    int id = (int) cursor.next().get("id");
+				float score =  hm.get(id);
+				boostADoc(cursor.next(), score);	
 			}
 			
 		} catch	(Exception	e)	{	
@@ -136,16 +138,45 @@ public class MyLucene {
 		}
 		
 		
+	
+		public static void resetBoostLucene(DBCursor cursor, Float score){
 		
+			try	{	
+				dir	=	FSDirectory.open(new File(INDEX_DIR));	
+				Analyzer	analyzer	=	new	StandardAnalyzer(Version.LUCENE_45);	
+				IndexWriterConfig iwc	=	new	IndexWriterConfig(Version.LUCENE_45, analyzer);	
+				iwc.setOpenMode(OpenMode.CREATE);	
+				writer = new IndexWriter(dir, iwc);	
+				
+				while(cursor.hasNext()){				
+					boostADoc(cursor.next(), score);	
+				}
+				
+			} catch	(Exception	e)	{	
+				e.printStackTrace();	
+				}	finally	{	
+					try	{	
+					 	if	(writer	!=	null)	{	
+							writer.close();	
+					 	}
+					 	if	(dir	!=	null)	{
+							dir.close();	
+					 	}
+					 } catch (IOException	e)	{	
+							e.printStackTrace();	
+					 	
+					 }
+				}	
+		}
+
 		
-		
-private static void boostADoc(DBObject object, HashMap<Integer, Float> hm) throws IOException	{	
+		private static void boostADoc(DBObject object, Float score) throws IOException	{	
 			
 			try{
 				Document lucDoc	=	new	Document();	
 				
 				int id = (int) object.get("id");
-				float score =  hm.get(id);
+				//float score =  hm.get(id);
 				System.out.println("applying boost " + score + " to doc " + id);
 				
 				FieldType myStringType = new FieldType(StringField.TYPE_STORED);
