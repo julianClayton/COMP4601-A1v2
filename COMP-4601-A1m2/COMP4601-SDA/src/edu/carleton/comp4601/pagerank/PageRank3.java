@@ -125,11 +125,11 @@ public class PageRank3 {
 		ArrayList<Document> documents = DatabaseManager.getInstance().getAllDocuments();
 		ArrayList<HashMap<Integer, Float>> documentsWithRank = new ArrayList<HashMap<Integer, Float>>();
 		pageRankMatrix.print(pageRankMatrix.getRowDimension(), pageRankMatrix.getColumnDimension());
-		for (int i = 0; i < documents.size(); i++) {
+		for (int i = 1; i < documents.size(); i++) {
 			HashMap map = new HashMap<Integer, Float>();
-			map.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
-			boostMap.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
-			map.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
+			map.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i-1));
+			boostMap.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i-1));
+			map.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i-1));
 			documentsWithRank.add(map);
 		}
 		return documentsWithRank;

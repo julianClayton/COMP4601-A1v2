@@ -50,16 +50,20 @@ public class Crawler extends WebCrawler{
         	 this.getMyController().getConfig().setPolitenessDelay(delay*(int)time);
          }*/
          
-         Vertex v = new Vertex(url);
+         
+         Vertex v = new Vertex(docID, url);
+         
+         PageParser p = new PageParser(url, page);
+         
         
          DatabaseManager dm = DatabaseManager.getInstance();
-         dm.addVertexToDb(v);
+         dm.addPageToDb(p);
          if (Controller.pageGraph.hasVertex(parentUrl)) {
         	 Controller.pageGraph.connectToExistingVertex(v, parentUrl);
          }
          else {
         	 Controller.pageGraph.addVertex(v);
-           
-         }      
-     }
-}
+          }      
+     }    
+} 
+    

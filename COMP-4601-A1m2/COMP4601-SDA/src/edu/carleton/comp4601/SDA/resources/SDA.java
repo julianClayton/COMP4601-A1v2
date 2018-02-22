@@ -65,6 +65,7 @@ public class SDA implements Serializable {
 	@Context
 	Request request;
 	private String name;
+	DocumentCollection docCollection;
 	
 	public SDA() {
 		name = "COMP4601 Searchable Document Archive V2.1: Julian and Laura";
@@ -110,7 +111,6 @@ public class SDA implements Serializable {
 	}
 	
 
-	
 	@POST
 	@Path("{DOC_ID}")
 	@Produces(MediaType.TEXT_HTML)
@@ -140,17 +140,6 @@ public class SDA implements Serializable {
 			return Response.status(204).build();
 		}
 		return Response.ok().build();
-	}
-
-	@GET
-	@Path("/reset")
-	@Produces(MediaType.TEXT_HTML)
-	public String reset() {
-		boolean reset = DatabaseManager.getInstance().deleteAllDocuments();
-		if (reset){
-			return "All documents reset";
-		}
-		return "ERROR: could not remove docs";
 	}
 	
 	@GET
@@ -253,7 +242,7 @@ public class SDA implements Serializable {
 		htmlList = htmlList + "</ul>";
 		return "<html><head><title>Document List</title></head><body><h1>Documents with tag(s) " + titleString + "</h1>" + htmlList +"</body></html>";
 	}
-
+	
 	@GET 
 	@Path("query/{TERMS}")
 	@Produces(MediaType.TEXT_HTML)
@@ -293,6 +282,17 @@ public class SDA implements Serializable {
 		String sr = ServiceRegistrar.list();
 		return sr;
 	}
+	
+	@GET
+	@Path("noboost")
+	@Produces(MediaType.TEXT_HTML)
+	public String resetBoost() {
+		 //ArrayList<Document> queryDocs = MyLucene.query(terms);
+		Float boost = 1.0f; 
+		MyLucene.resetBoostLucene(DatabaseManager.getInstance().getAllDocCursor(), boost);
+		return "Boost reset";
+	}
+	
 	private String resetDocuments(String path) {
 		if (!path.toLowerCase().equals("reset")) {
 			return pageNotFound();
@@ -315,8 +315,8 @@ public class SDA implements Serializable {
 	@Path("pagerank")
 	@Produces(MediaType.TEXT_HTML)
 	public String getGraph2()  {
-        ArrayList<HashMap<String, Float>> pr = PageRank3.getInstance().computePageRank();
-		ArrayList<HashMap<String, Float>> docsWithRank = PageRank3.getInstance().computePageRank();
+        ArrayList<HashMap<Integer, Float>> pr = PageRank3.getInstance().computePageRank();
+		ArrayList<HashMap<Integer, Float>> docsWithRank = PageRank3.getInstance().computePageRank();
 		
 		StringBuilder htmlBuilder = new StringBuilder();
 		htmlBuilder.append("<html>");
@@ -325,28 +325,15 @@ public class SDA implements Serializable {
 		htmlBuilder.append("<table style=\"width:100%\">");	
 		System.out.println(docsWithRank.size());
 		for(HashMap map : docsWithRank) {
-			System.out.println("loop");
 			htmlBuilder.append("<tr>");
 			htmlBuilder.append("<td>" + map.keySet() + "</td>");
 			htmlBuilder.append("<td>" + map.values() + "</td>");
 			htmlBuilder.append("</tr>");
 		}
-		htmlBuilder.append("</table>");
-		htmlBuilder.append("</body>");
-		htmlBuilder.append("</html>");		
-		
-		
 		
 		return htmlBuilder.toString();
 	}
-	
-	
-	private void initGraphObjects() {
-		Vertex vertex = new Vertex();
-		Page page = new Page(null);
-		DefaultEdge e = new DefaultEdge();
-		Graph directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
-	}
+
 }
 
 
