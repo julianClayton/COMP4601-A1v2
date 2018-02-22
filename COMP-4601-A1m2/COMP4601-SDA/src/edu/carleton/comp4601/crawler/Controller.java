@@ -12,6 +12,7 @@ import edu.carleton.comp4601.pagerank.PageRank2;
 import edu.carleton.comp4601.networking.Marshaller;
 import edu.carleton.comp4601.pagerank.PageRank3;
 import edu.carleton.comp4601.pagerank.PageRank2;
+import edu.carleton.comp4601.pagerank.PageRank3;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -37,6 +38,7 @@ public class Controller {
         config.setCrawlStorageFolder(crawlStorageFolder);
         
         config.setMaxPagesToFetch(4);
+
 
         config.setPolitenessDelay(1000);
 
@@ -74,6 +76,24 @@ public class Controller {
         ///PageRank2.computePageRank(pageGraph.getGraph());
         ArrayList<HashMap<String, Float>> pr = PageRank3.getInstance().computePageRank();
         System.out.println(PageRank3.getInstance().getBoostMap());
+        System.out.println("\nResults FIRST: " + MyLucene.query("+banana").toString());
+        
+        //DatabaseManager.getInstance().addGraphToDb(pageGraph);
+        //PageGraph pg = DatabaseManager.getInstance().loadGraphFromDB();
+       // Matrix m = PageRank2.computePageRank(pg.getGraph());
+       // m.print(m.getRowDimension(), m.getColumnDimension());
+        ///PageRank2.computePageRank(pageGraph.getGraph());
+        System.out.println(PageRank3.getInstance().getBoostMap());
+        
+        HashMap <Integer, Float> boostMap = PageRank3.getInstance().getBoostMap();
+
+        MyLucene.reindexLucene(DatabaseManager.getInstance().getAllDocCursor(), boostMap);
+        
+        System.out.println("Results after boost: " + MyLucene.query("+banana").toString());
+        
+        //MyLucene.indexLucene(DatabaseManager.getInstance().getAllDocCursor());
+        
+        //System.out.println("\nResults AGAIN: " + MyLucene.query("+banana").toString());
 
     }
 }

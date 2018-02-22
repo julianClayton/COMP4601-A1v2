@@ -48,7 +48,7 @@ public class DatabaseManager {
 	private int getDocNum() {
 		switchCollection(DOC_NUM_COL);
 		DBCursor cur = col.find().limit(1);
-		int num = 0;
+		int num = 1000;
 		if (cur.hasNext()) {
 			DBObject obj = cur.next();
 			num = (int) obj.get("docnum");
@@ -113,7 +113,7 @@ public class DatabaseManager {
 	public void addVertexToDb(Vertex vert) {
 		incrementDocNum();
 		Document document = vert.getDoc();
-		int id = getDocNum();
+		int id = vert.getID();
 		switchCollection(DOC_COL);
 		document.setId(id);
 		DBObject obj = BasicDBObjectBuilder
