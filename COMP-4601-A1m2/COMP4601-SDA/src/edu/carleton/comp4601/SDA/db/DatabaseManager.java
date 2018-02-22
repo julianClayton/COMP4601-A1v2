@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import edu.carleton.comp4601.graph.*;
 import edu.carleton.comp4601.networking.Marshaller;
@@ -17,7 +18,9 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 import Jama.Matrix;
+import edu.carleton.comp4601.crawler.PageParser;
 import edu.carleton.comp4601.dao.Document;
+import edu.carleton.comp4601.dao.DocumentCollection;
 
 public class DatabaseManager {
 	
@@ -110,10 +113,10 @@ public class DatabaseManager {
 		col.save(obj);
 	}
 	
-	public void addVertexToDb(Vertex vert) {
+	public void addPageToDb(PageParser p) {
 		incrementDocNum();
-		Document document = vert.getDoc();
-		int id = vert.getID();
+		Document document = p.getDoc();
+		int id = p.getID();
 		switchCollection(DOC_COL);
 		document.setId(id);
 		DBObject obj = BasicDBObjectBuilder
@@ -123,8 +126,8 @@ public class DatabaseManager {
 				.add("text", document.getText())
 				.add("tags",document.getTags())
 				.add("links", document.getLinks())
-				.add("metadata",vert.getType())
-				.add("timestamp",vert.getTime())
+				.add("metadata",p.getType())
+				.add("timestamp",p.getTime())
 				.get();
 
 		col.save(obj);

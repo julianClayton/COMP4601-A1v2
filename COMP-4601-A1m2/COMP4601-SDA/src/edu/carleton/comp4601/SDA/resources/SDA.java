@@ -1,6 +1,6 @@
 package edu.carleton.comp4601.SDA.resources;
 
-import java.awt.List;
+import java.util.List;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +65,7 @@ public class SDA {
 	@Context
 	Request request;
 	private String name;
+	DocumentCollection docCollection;
 	
 	public SDA() {
 		name = "COMP4601 Searchable Document Archive V2.1: Julian and Laura";
@@ -110,7 +111,6 @@ public class SDA {
 	}
 	
 
-	
 	@POST
 	@Path("{DOC_ID}")
 	@Produces(MediaType.TEXT_HTML)
@@ -243,7 +243,6 @@ public class SDA {
 		return "<html><head><title>Document List</title></head><body><h1>Documents with tag(s) " + titleString + "</h1>" + htmlList +"</body></html>";
 	}
 	
-
 	@GET 
 	@Path("query/{TERMS}")
 	@Produces(MediaType.TEXT_HTML)
@@ -316,7 +315,7 @@ public class SDA {
 	public String getDocPageRanks() {
 		DatabaseManager dbm = DatabaseManager.getInstance();
 		PageGraph pg = new PageGraph();
-		Vertex vertex = new Vertex("", new Page(null));
+		Vertex vertex = new Vertex(-1, "");
 		Page page = new Page(null);
 		dbm.getAllPageRanks();
 		//ArrayList<HashMap<String, Float>> documents = dbm.getAllPageRanks();
@@ -333,7 +332,7 @@ public class SDA {
 	@Produces(MediaType.TEXT_HTML)
 	public String getGraph() {
 		PageGraph pg = new PageGraph();
-		Vertex vertex = new Vertex("", new Page(null));
+		Vertex vertex = new Vertex(-1, "");
 		Page page = new Page(null);
 		Graph directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
 	  	java.io.InputStream	input;	

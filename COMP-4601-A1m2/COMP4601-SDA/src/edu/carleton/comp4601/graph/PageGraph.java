@@ -22,7 +22,7 @@ public class PageGraph implements Serializable{
 	public PageGraph(String baseUrl, String name) {
 		directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
 		vertexMap = new HashMap<String, Vertex>();
-		vertexMap.put(BASE_VERTEX_KEY, new Vertex(null, BASE_VERTEX_KEY));
+		vertexMap.put(BASE_VERTEX_KEY, new Vertex(-1, BASE_VERTEX_KEY));
 		this.baseUrl = baseUrl;
 		this.name = name;
 		iterations = 0;
