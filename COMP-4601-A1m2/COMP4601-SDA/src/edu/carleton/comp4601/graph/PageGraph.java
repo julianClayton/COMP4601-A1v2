@@ -22,7 +22,7 @@ public class PageGraph implements Serializable{
 	public PageGraph(String baseUrl, String name) {
 		directedGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(DefaultEdge.class);
 		vertexMap = new ConcurrentHashMap<String, Vertex>();
-		vertexMap.put(BASE_VERTEX_KEY, new Vertex(-1, BASE_VERTEX_KEY));
+		//vertexMap.put(baseUrl, new Vertex(-1, BASE_VERTEX_KEY));
 
 		this.baseUrl = baseUrl;
 	}
@@ -44,7 +44,7 @@ public class PageGraph implements Serializable{
 		directedGraph.addEdge(vertex1, vertex2);
 		
 	}
-	public synchronized void connectToExistingVertex(Vertex vertex1, String vertex2url) {
+	public synchronized void connectExisitingVertexToNewVertex(Vertex vertex1, String vertex2url) {
 		directedGraph.addVertex(vertex1);
 		vertexMap.put(vertex1.getUrl(), vertex1);
 		Vertex vertex2;
@@ -53,7 +53,7 @@ public class PageGraph implements Serializable{
 		directedGraph.addEdge(vertex2, vertex1);
 		
 	}
-	public synchronized void connectToExistingVertexAsParent(Vertex vertex1, String vertex2url) {
+	public synchronized void connectNewVertexToExistingVertex(Vertex vertex1, String vertex2url) {
 		directedGraph.addVertex(vertex1);
 		vertexMap.put(vertex1.getUrl(), vertex1);
 		Vertex vertex2;
@@ -66,6 +66,7 @@ public class PageGraph implements Serializable{
 		directedGraph.addEdge(vertex1, vertex2);
 		
 	}
+
 	public synchronized Vertex getVertex(String url) {
 		Vertex vertex = vertexMap.get(url);
 		return vertex;
@@ -84,6 +85,9 @@ public class PageGraph implements Serializable{
 	}
 	public Graph<Vertex, DefaultEdge> getGraph() {
 		return directedGraph;
+	}
+	public ConcurrentHashMap getMap() {
+		return vertexMap;
 	}
 
 }

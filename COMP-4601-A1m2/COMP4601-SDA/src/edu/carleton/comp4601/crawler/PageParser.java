@@ -106,7 +106,7 @@ public class PageParser {
 	        
 	        this.headings = elementToList(jdoc.select("h0,h1,h2,h3,h4,h5"));
 	        this.text = jdoc.body().text();
-	        this.links = elementToList(jdoc.select("a[href]")); 
+	        this.links = extractLinks(jdoc.select("a[href]")); 
 	        this.imgAltMap = getImgAlts(jdoc);
 	        
 	        SDAdoc.setText(this.text);
@@ -168,7 +168,13 @@ public class PageParser {
 		}
 		return hm;
 	}
-	
+	private ArrayList<String> extractLinks(Elements el) {
+		ArrayList<String> al = new ArrayList<String>();
+		for	(Element	e	:	el)	{	
+     		 al.add(e.absUrl("href"));
+       }	
+		return al;
+	}
 	private ArrayList<String> elementToList(Elements el){
 		ArrayList<String> al = new ArrayList<String>();
 		for	(Element	e	:	el)	{	
