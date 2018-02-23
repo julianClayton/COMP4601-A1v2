@@ -23,6 +23,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 
 import Jama.Matrix;
+import edu.carleton.comp4601.crawler.Controller;
 import edu.carleton.comp4601.crawler.PageParser;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.dao.DocumentCollection;
@@ -104,7 +105,6 @@ public class DatabaseManager {
 	public void addDocToDb(Document document) {
 		incrementDocNum();
 		int id = getDocNum();
-		switchCollection(DOC_COL);
 		document.setId(id);
 		DBObject obj = BasicDBObjectBuilder
 				.start("name", document.getName())
@@ -114,7 +114,26 @@ public class DatabaseManager {
 				.add("tags",document.getTags())
 				.add("links", document.getLinks())
 				.get();
-
+		
+		byte[] bytes = getGraphData();
+		PageGraph pg = null;
+		try {
+			pg = (PageGraph) Marshaller.deserializeObject(bytes);
+			Vertex v = new Vertex(id,document.getUrl());
+			for (String link : document.getLinks()) {
+				if (pg.hasVertex(link)){
+					pg.connectToExistingVertexAsParent(v, link);
+				}
+				else {
+					pg.addVertex(v);
+				}
+			}
+			bytes = Marshaller.serializeObject(pg);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		addNewGraph(bytes);
+		switchCollection(DOC_COL);
 		col.save(obj);
 	}
 	
