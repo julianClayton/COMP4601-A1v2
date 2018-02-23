@@ -204,7 +204,6 @@ public class SDA implements Serializable {
 	@Path("search/{TAGS}")
 	@Produces(MediaType.TEXT_HTML)
 	public String searchDocumentWithTags(@PathParam("TAGS") String tags) {
-		DatabaseManager dbm = DatabaseManager.getInstance();
 		ArrayList<String> tagsList = new ArrayList<String>(Arrays.asList(tags.split("[+]")));	
 			
 		String titleString = "";
@@ -213,7 +212,6 @@ public class SDA implements Serializable {
 		}
 		ArrayList<Document> docsList = new ArrayList<Document>();
 		ArrayList<Document> queryDocs = MyLucene.query(tags);
-	    DocumentCollection dc = new DocumentCollection();
 		SearchResult sr = SearchServiceManager.getInstance().query(tags); 
 	    try {
 	    	sr.await(SDAConstants.TIMEOUT, TimeUnit.SECONDS);
@@ -222,7 +220,6 @@ public class SDA implements Serializable {
 	    }
 		docsList.addAll(sr.getDocs());
 		docsList.addAll(queryDocs);
-		dc.setDocuments(docsList);
 		String htmlList = "<ul>";
 		for (Document doc : docsList) {
 			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
@@ -240,25 +237,24 @@ public class SDA implements Serializable {
 	@Path("search/{TAGS}")
 	@Produces(MediaType.TEXT_XML)
 	public DocumentCollection searchDocumentWithTagsXML(@PathParam("TAGS") String tags) {
-		DatabaseManager dbm = DatabaseManager.getInstance();
 		ArrayList<String> tagsList = new ArrayList<String>(Arrays.asList(tags.split("[+]")));	
 			
 		String titleString = "";
 		for (String tag : tagsList) {
 			titleString = titleString + tag + ", ";
 		}
-		ArrayList<Document> docs = new ArrayList<Document>();
-		
-		DocumentCollection dc = dbm.getDocumentsWithTags(tagsList);
+		ArrayList<Document> docsList = new ArrayList<Document>();
+		ArrayList<Document> queryDocs = MyLucene.query(tags);
+	    DocumentCollection dc = new DocumentCollection();
 		SearchResult sr = SearchServiceManager.getInstance().search(tags); 
 	    try {
 	    	sr.await(SDAConstants.TIMEOUT, TimeUnit.SECONDS);
 	    } catch (InterruptedException e){
 	    	e.printStackTrace();
 	    }
-		docs.addAll(sr.getDocs());
-		docs.addAll(dc.getDocuments());
-		dc.setDocuments(docs);
+		docsList.addAll(queryDocs);
+		docsList.addAll(dc.getDocuments());
+		dc.setDocuments(docsList);
 		
 		return dc;
 	}
