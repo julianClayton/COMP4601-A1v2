@@ -36,7 +36,6 @@ import edu.carleton.comp4601.SDA.db.DatabaseManager;
 public class MyLucene {
 	
 	private static final String INDEX_DIR = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Lucene";
-	
 	private static FSDirectory dir;
 	private static IndexWriter	writer;
 	
@@ -114,10 +113,11 @@ public class MyLucene {
 			iwc.setOpenMode(OpenMode.CREATE);	
 			writer = new IndexWriter(dir, iwc);	
 			
-			while(cursor.hasNext()){				
-			    int id = (int) cursor.next().get("id");
+			while(cursor.hasNext()){	
+				DBObject ob = cursor.next();
+			    int id = (int) ob.get("id");
 				float score =  hm.get(id);
-				boostADoc(cursor.next(), score);	
+				boostADoc(ob, score);	
 			}
 			
 		} catch	(Exception	e)	{	
@@ -208,6 +208,7 @@ public class MyLucene {
 				writer.updateDocument(term, lucDoc);
 				
 			}catch(Exception e){
+				e.printStackTrace();
 				System.out.println("-------Error:  " + e);	
 			}
 		}

@@ -268,7 +268,7 @@ public class DatabaseManager {
 	public DBCursor getAllDocCursor(){
 		switchCollection(DOC_COL);
 		BasicDBObject query	= new BasicDBObject();	
-		DBCursor cursor = col.find(query);	
+		DBCursor cursor = col.find();	
 		return cursor;
 	}
 
