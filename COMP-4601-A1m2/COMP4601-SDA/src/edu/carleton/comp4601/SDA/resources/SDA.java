@@ -292,6 +292,19 @@ public class SDA implements Serializable {
 		MyLucene.resetBoostLucene(DatabaseManager.getInstance().getAllDocCursor(), boost);
 		return "Boost reset";
 	}
+	@GET
+	@Path("boost")
+	@Produces(MediaType.TEXT_HTML)
+	public String boost() {
+		try {
+			PageRank3.getInstance().computePageRank();
+			MyLucene.reindexLucene(DatabaseManager.getInstance().getAllDocCursor(), PageRank3.getInstance().getBoostMap());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "<html><head><title>Documents Boost Failed</title></head><body><h1>Documents Boost Failed!</h1></body></html>";
+		}
+		return "<html><head><title>Documents Boosted!</title></head><body><h1>Documents Boosted!</h1></body></html>";
+	}
 	
 	private String resetDocuments(String path) {
 		if (!path.toLowerCase().equals("reset")) {
@@ -301,9 +314,9 @@ public class SDA implements Serializable {
 		try {
 			dbm.dropDocuments();
 		} catch (MongoException e) {
-			return "<html><head><title>Document Reset Failed!</title></head></html>";
+			return "<html><head><title>Document Reset Failed!</title></head><body><h1>Documents Dropped!</h1></body></html>";
 		}
-		return "<html><head><title>Documents Dropped!</title></head></html>";
+		return "<html><head><title>Documents Dropped!</title></head><body><h1>Documents Dropped!</h1></body></html>";
 	}
 	public String pageNotFound() {
 		return "<html><head><title>404: Resource not foudn</title></head><body><h1>404</h1> The page you are looking for does not exist</body></html>";
