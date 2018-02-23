@@ -2,9 +2,12 @@ package edu.carleton.comp4601.searching;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
+import javax.ws.rs.Path;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -34,8 +37,7 @@ import com.mongodb.DBObject;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 
 public class MyLucene {
-	
-	private static final String INDEX_DIR = "/Users/lauramcdougall/Documents/Carleton/COMP4601/Lucene";
+	private static final String INDEX_DIR = "/Users/julianclayton/Documents/workspace/COMP4601-A1v2/COMP-4601-A1m2/COMP4601-SDA/Lucene";
 	private static FSDirectory dir;
 	private static IndexWriter	writer;
 	

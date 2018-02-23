@@ -1,7 +1,4 @@
 package edu.carleton.comp4601.SDA.resources;
-import java.io.Serializable;
-import java.awt.List;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,11 +20,10 @@ import javax.ws.rs.core.UriInfo;
 import java.util.concurrent.TimeUnit;
 import com.mongodb.MongoException;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
-import edu.carleton.comp4601.SDA.db.DocumentCollectionWrapper;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.dao.DocumentCollection;
 import edu.carleton.comp4601.searching.MyLucene;
-import edu.carleton.comp4601.pagerank.PageRank3;
+import edu.carleton.comp4601.pagerank.PageRank;
 import edu.carleton.comp4601.utility.SDAConstants;
 import edu.carleton.comp4601.utility.SearchResult;
 import edu.carleton.comp4601.utility.SearchServiceManager;
@@ -35,7 +31,7 @@ import edu.carleton.comp4601.utility.ServiceRegistrar;
 
 
 @Path("sda")
-public class SDA implements Serializable {
+public class SDA {
 	@Context
 	UriInfo uriInfo;
 	@Context
@@ -320,8 +316,8 @@ public class SDA implements Serializable {
 	@Produces(MediaType.TEXT_HTML)
 	public String boost() {
 		try {
-			PageRank3.getInstance().computePageRank();
-			MyLucene.reindexLucene(DatabaseManager.getInstance().getAllDocCursor(), PageRank3.getInstance().getBoostMap());
+			PageRank.getInstance().computePageRank();
+			MyLucene.reindexLucene(DatabaseManager.getInstance().getAllDocCursor(), PageRank.getInstance().getBoostMap());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "<html><head><title>Documents Boost Failed</title></head><body><h1>Documents Boost Failed!</h1></body></html>";
@@ -351,8 +347,8 @@ public class SDA implements Serializable {
 	@Path("pagerank")
 	@Produces(MediaType.TEXT_HTML)
 	public String getGraph2()  {
-        ArrayList<HashMap<Integer, Float>> pr = PageRank3.getInstance().computePageRank();
-		ArrayList<HashMap<Integer, Float>> docsWithRank = PageRank3.getInstance().computePageRank();
+        ArrayList<HashMap<Integer, Float>> pr = PageRank.getInstance().computePageRank();
+		ArrayList<HashMap<Integer, Float>> docsWithRank = PageRank.getInstance().computePageRank();
 		
 		StringBuilder htmlBuilder = new StringBuilder();
 		htmlBuilder.append("<html>");
@@ -365,8 +361,7 @@ public class SDA implements Serializable {
 			htmlBuilder.append("<td>" + map.keySet() + "</td>");
 			htmlBuilder.append("<td>" + map.values() + "</td>");
 			htmlBuilder.append("</tr>");
-		}
-		
+		}		
 		return htmlBuilder.toString();
 	}
 

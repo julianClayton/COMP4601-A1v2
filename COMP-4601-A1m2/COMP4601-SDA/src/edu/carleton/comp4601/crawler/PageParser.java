@@ -2,11 +2,9 @@ package edu.carleton.comp4601.crawler;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.parser.AutoDetectParser;

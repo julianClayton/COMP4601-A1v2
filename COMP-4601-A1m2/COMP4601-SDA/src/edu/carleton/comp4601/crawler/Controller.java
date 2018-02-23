@@ -12,6 +12,7 @@ import edu.carleton.comp4601.graph.PageGraph;
 import edu.carleton.comp4601.graph.Vertex;
 import edu.carleton.comp4601.searching.MyLucene;
 import edu.carleton.comp4601.networking.Marshaller;
+
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -22,24 +23,24 @@ public class Controller {
 	
 	public static ArrayList<String> urls = new ArrayList<String>();
 	
-
-	static final public String SEED1 = "http://people.scs.carleton.ca/~oommen/"; 
-	static final public String SEED2 = "https://www.nytimes.com/";
-	static final public String SEED3 = "http://www.cbc.ca/";
-
+	//static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
+	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/N-0.html";
+	//static final public String SEED3 = "https://www.reddit.com/";
 	public static PageGraph pageGraph;
     
     public static void main(String[] args) throws Exception {
         int numCrawlers = 3;
         pageGraph = new PageGraph();
         pageGraph.addVertex(new Vertex(1,SEED2));
-        pageGraph.addVertex(new Vertex(2, SEED3));
         CrawlConfig config = new CrawlConfig();
         
         String crawlStorageFolder = ".";
 
         config.setCrawlStorageFolder(crawlStorageFolder);
-        config.setMaxPagesToFetch(50);
+        
+        config.setMaxPagesToFetch(10);
+
+
         config.setPolitenessDelay(1000);
 
         config.setIncludeBinaryContentInCrawling(true);
@@ -55,7 +56,7 @@ public class Controller {
 
         //controller.addSeed(SEED1);
         controller.addSeed(SEED2);
-        controller.addSeed(SEED3);
+        //controller.addSeed(SEED3);
        
         controller.start(Crawler.class, numCrawlers);
         

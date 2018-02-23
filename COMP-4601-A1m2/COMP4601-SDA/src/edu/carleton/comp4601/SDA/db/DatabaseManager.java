@@ -4,14 +4,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-import java.util.List;
 
 import edu.carleton.comp4601.graph.*;
 import edu.carleton.comp4601.networking.Marshaller;
-import edu.carleton.comp4601.pagerank.PageRank2;
-import edu.carleton.comp4601.pagerank.PageRank3;
+import edu.carleton.comp4601.pagerank.PageRank;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -375,7 +371,7 @@ public class DatabaseManager {
 	}
 	public ArrayList<HashMap<Integer, Float>> getAllPageRanks() {
 		
-		ArrayList<HashMap<Integer, Float>> docsWithRank = PageRank3.getInstance().computePageRank();
+		ArrayList<HashMap<Integer, Float>> docsWithRank = PageRank.getInstance().computePageRank();
 		
 		
 		return docsWithRank;
