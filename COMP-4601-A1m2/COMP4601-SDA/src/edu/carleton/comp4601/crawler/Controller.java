@@ -22,9 +22,11 @@ public class Controller {
 	
 	public static ArrayList<String> urls = new ArrayList<String>();
 	
-	//static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
-	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/N-0.html";
-	static final public String SEED3 = "https://www.reddit.com/";
+
+	static final public String SEED1 = "http://people.scs.carleton.ca/~oommen/"; 
+	static final public String SEED2 = "https://www.nytimes.com/";
+	static final public String SEED3 = "http://www.cbc.ca/";
+
 	public static PageGraph pageGraph;
     
     public static void main(String[] args) throws Exception {
@@ -37,10 +39,7 @@ public class Controller {
         String crawlStorageFolder = ".";
 
         config.setCrawlStorageFolder(crawlStorageFolder);
-        
-        config.setMaxPagesToFetch(25);
-
-
+        config.setMaxPagesToFetch(50);
         config.setPolitenessDelay(1000);
 
         config.setIncludeBinaryContentInCrawling(true);
