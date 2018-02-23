@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import java.util.concurrent.TimeUnit;
 import com.mongodb.MongoException;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
+import edu.carleton.comp4601.SDA.db.DocumentCollectionWrapper;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.dao.DocumentCollection;
 import edu.carleton.comp4601.searching.MyLucene;
@@ -41,11 +42,11 @@ public class SDA implements Serializable {
 	Request request;
 	private String name;
 	DocumentCollection docCollection;
-	
 	public SDA() {
 		name = "COMP4601 Searchable Document Archive V2.1: Julian and Laura";
+		DatabaseManager.getInstance().getAllDocuments();
 	}
-	
+
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public String sda2() {
@@ -204,13 +205,14 @@ public class SDA implements Serializable {
 	@Produces(MediaType.TEXT_HTML)
 	public String searchDocumentWithTags(@PathParam("TAGS") String tags) {
 		DatabaseManager dbm = DatabaseManager.getInstance();
-		ArrayList<String> tagsList = new ArrayList<String>(Arrays.asList(tags.split("\\s*,\\s*")));	
+		ArrayList<String> tagsList = new ArrayList<String>(Arrays.asList(tags.split("[+]")));	
 			
 		String titleString = "";
 		for (String tag : tagsList) {
 			titleString = titleString + tag + ", ";
 		}
-		ArrayList<Document> docs = dbm.getDocumentsWithTags(tagsList);
+		ArrayList<Document> docs = new ArrayList<Document>();
+		DocumentCollection dc = dbm.getDocumentsWithTags(tagsList);
 		SearchResult sr = SearchServiceManager.getInstance().search(tags); 
 	    try {
 	    	sr.await(SDAConstants.TIMEOUT, TimeUnit.SECONDS);
@@ -218,13 +220,18 @@ public class SDA implements Serializable {
 	    	e.printStackTrace();
 	    }
 		docs.addAll(sr.getDocs());
-
+		docs.addAll(dc.getDocuments());
+		dc.setDocuments(docs);
 		String htmlList = "<ul>";
 		for (Document doc : docs) {
 			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
 			htmlList = htmlList +  "<li>" + link + "</li>";
 		}
 		htmlList = htmlList + "</ul>";
+		for (Document doc : dc.getDocuments()) {
+			System.out.println(doc.getName() + " " + doc.getTags());
+		}
+		
 		return "<html><head><title>Document List</title></head><body><h1>Documents with tag(s) " + titleString + "</h1>" + htmlList +"</body></html>";
 	}
 	
@@ -235,8 +242,6 @@ public class SDA implements Serializable {
 	    ArrayList<Document> queryDocs = MyLucene.query(terms);
 	    DocumentCollection docs = new DocumentCollection();
 	    docs.setDocuments(queryDocs);
-	    
-	  
 	    String htmlList = "<ul>";
 		for (Document doc : queryDocs) {
 			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() + " Score: " + doc.getScore() +" </a>";
@@ -245,7 +250,15 @@ public class SDA implements Serializable {
 		htmlList = htmlList + "</ul>";
 		return "<html><head><title>Document List</title></head><body><h1>Documents that match terms(s) " + terms + "</h1>" + htmlList +"</body></html>";
 	}
-	
+	@GET
+	@Path("query/{TERMS}")
+	@Produces(MediaType.TEXT_XML)
+	public DocumentCollection queryDocsWithTermsXML(@PathParam("TERMS") String terms) {
+	    ArrayList<Document> queryDocs = MyLucene.query(terms);
+	    DocumentCollection docs = new DocumentCollection();
+	    docs.setDocuments(queryDocs);
+		return  docs;
+	}
 	@GET 
 	@Path("documents")
 	@Produces(MediaType.TEXT_HTML)

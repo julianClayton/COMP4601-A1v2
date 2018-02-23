@@ -135,6 +135,7 @@ public class DatabaseManager {
 		addNewGraph(bytes);
 		switchCollection(DOC_COL);
 		col.save(obj);
+		getAllDocuments();
 	}
 	
 	public void addPageToDb(PageParser p) {
@@ -155,6 +156,7 @@ public class DatabaseManager {
 				.get();
 
 		col.save(obj);
+		getAllDocuments();
 	}
 	
 
@@ -169,6 +171,7 @@ public class DatabaseManager {
 		newObject.put("links", links);
 		col.remove(new BasicDBObject("id",id));
 		col.save(newObject);
+		getAllDocuments();
 	}
 	public void updateDocTags(int id, ArrayList<String> tags) {
 		switchCollection(DOC_COL);
@@ -181,6 +184,7 @@ public class DatabaseManager {
 		newObject.put("tags", tags);
 		col.remove(new BasicDBObject("id",id));
 		col.save(newObject);
+		getAllDocuments();
 	}
 	
 	public Document getDocument(int id) {
@@ -213,6 +217,7 @@ public class DatabaseManager {
 			isFound = true;
 			col.remove(obj);
 		}
+		getAllDocuments();
 		return isFound;
 	}
 	public boolean deleteDocumentsWithTags(ArrayList<String> tags) {
@@ -228,6 +233,7 @@ public class DatabaseManager {
 			col.remove(obj);
 			docsDeleted = true;
 		}
+		getAllDocuments();
 		return docsDeleted;
 	}
 
@@ -240,17 +246,18 @@ public class DatabaseManager {
 			col.remove(cursor.next());
 			docsDeleted = true;
 		}
-
+		getAllDocuments();
 		return docsDeleted;
 	}
 
-	public ArrayList<Document> getDocumentsWithTags(ArrayList<String> tags) {
+	public DocumentCollection getDocumentsWithTags(ArrayList<String> tags) {
 		switchCollection(DOC_COL);
 		BasicDBObject inQuery = new BasicDBObject();
 		inQuery.put("tags", new BasicDBObject("$in", tags));
 		DBCursor cursor = col.find(inQuery);
 		DBObject obj = null;
 		ArrayList<Document> docs = new ArrayList<Document>();
+		DocumentCollection dc = new DocumentCollection();
 		while(cursor.hasNext()) {
 			obj = cursor.next();
 			Document document = new Document();
@@ -262,12 +269,14 @@ public class DatabaseManager {
 			document.setName((String) obj.get("name"));
 			docs.add(document);
 		}
-		return docs;
+		dc.setDocuments(docs);
+		return dc;
 	}
 	
 	public ArrayList<Document> getAllDocuments() {
 		switchCollection(DOC_COL);
 		DBCursor cursor = col.find();
+		
 		ArrayList<Document> docs = new ArrayList<Document>();
 		DBObject obj = null;
 		while(cursor.hasNext()) {
@@ -281,6 +290,8 @@ public class DatabaseManager {
 			document.setName((String) obj.get("name"));
 			docs.add(document);
 		}
+		
+		DocumentCollectionWrapper.getInstance().getDocumentCollection().setDocuments(docs); 
 		return docs;
 	}
 	
@@ -359,6 +370,7 @@ public class DatabaseManager {
 		    col.remove(cursor.next());
 		    success = true;
 		}
+		getAllDocuments();
 		return success;
 	}
 	public ArrayList<HashMap<Integer, Float>> getAllPageRanks() {
