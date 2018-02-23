@@ -6,11 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.BodyContentHandler;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -25,37 +20,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import edu.uci.ics.crawler4j.crawler.Page;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.BodyContentHandler;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.xml.sax.SAXException;
+import java.util.concurrent.TimeUnit;
 import com.mongodb.MongoException;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.dao.Document;
 import edu.carleton.comp4601.dao.DocumentCollection;
 import edu.carleton.comp4601.searching.MyLucene;
-import edu.carleton.comp4601.graph.PageGraph;
-import org.jgrapht.*;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.Graph;
-import edu.carleton.comp4601.graph.Vertex;
-import edu.carleton.comp4601.networking.Marshaller;
 import edu.carleton.comp4601.pagerank.PageRank3;
+import edu.carleton.comp4601.utility.SDAConstants;
+import edu.carleton.comp4601.utility.SearchResult;
+import edu.carleton.comp4601.utility.SearchServiceManager;
 import edu.carleton.comp4601.utility.ServiceRegistrar;
-import edu.uci.ics.crawler4j.crawler.Page;
 
 
 @Path("sda")
@@ -230,11 +205,20 @@ public class SDA implements Serializable {
 	public String searchDocumentWithTags(@PathParam("TAGS") String tags) {
 		DatabaseManager dbm = DatabaseManager.getInstance();
 		ArrayList<String> tagsList = new ArrayList<String>(Arrays.asList(tags.split("\\s*,\\s*")));	
+			
 		String titleString = "";
 		for (String tag : tagsList) {
 			titleString = titleString + tag + ", ";
 		}
 		ArrayList<Document> docs = dbm.getDocumentsWithTags(tagsList);
+		SearchResult sr = SearchServiceManager.getInstance().search(tags); 
+	    try {
+	    	sr.await(SDAConstants.TIMEOUT, TimeUnit.SECONDS);
+	    } catch (InterruptedException e){
+	    	e.printStackTrace();
+	    }
+		docs.addAll(sr.getDocs());
+
 		String htmlList = "<ul>";
 		for (Document doc : docs) {
 			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
@@ -251,6 +235,8 @@ public class SDA implements Serializable {
 	    ArrayList<Document> queryDocs = MyLucene.query(terms);
 	    DocumentCollection docs = new DocumentCollection();
 	    docs.setDocuments(queryDocs);
+	    
+	  
 	    String htmlList = "<ul>";
 		for (Document doc : queryDocs) {
 			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() + " Score: " + doc.getScore() +" </a>";
