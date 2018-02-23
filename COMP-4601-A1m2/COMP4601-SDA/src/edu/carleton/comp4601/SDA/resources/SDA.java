@@ -99,12 +99,13 @@ public class SDA implements Serializable {
 		document.setText(text);
 		document.setLinks(linksList);
 		document.setTags(tagsList);
-		
+		document.setUrl(name);
 		
 		try {
 			DatabaseManager.getInstance().addDocToDb(document);
 			MyLucene.addDocument(document);
 		}catch (Exception e) {
+			e.printStackTrace();
 			return Response.status(204).build();
 		}
 		return Response.ok().build();

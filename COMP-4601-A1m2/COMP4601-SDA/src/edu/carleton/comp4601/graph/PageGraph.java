@@ -48,13 +48,22 @@ public class PageGraph implements Serializable{
 		directedGraph.addVertex(vertex1);
 		vertexMap.put(vertex1.getUrl(), vertex1);
 		Vertex vertex2;
+		vertex2 = vertexMap.get(vertex2url);
+		directedGraph.addVertex(vertex2);
+		directedGraph.addEdge(vertex2, vertex1);
+		
+	}
+	public synchronized void connectToExistingVertexAsParent(Vertex vertex1, String vertex2url) {
+		directedGraph.addVertex(vertex1);
+		vertexMap.put(vertex1.getUrl(), vertex1);
+		Vertex vertex2;
 		if (vertex2url == null) {
 			vertex2 = vertexMap.get(BASE_VERTEX_KEY);		
 		} else {
 			vertex2 = vertexMap.get(vertex2url);
 		}
 		directedGraph.addVertex(vertex2);
-		directedGraph.addEdge(vertex2, vertex1);
+		directedGraph.addEdge(vertex1, vertex2);
 		
 	}
 	public synchronized Vertex getVertex(String url) {
