@@ -9,6 +9,7 @@ import org.jgrapht.Graph;
 import Jama.Matrix;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
 import edu.carleton.comp4601.graph.PageGraph;
+import edu.carleton.comp4601.graph.Vertex;
 import edu.carleton.comp4601.searching.MyLucene;
 import edu.carleton.comp4601.pagerank.PageRank2;
 import edu.carleton.comp4601.networking.Marshaller;
@@ -26,20 +27,21 @@ public class Controller {
 	public static ArrayList<String> urls = new ArrayList<String>();
 	
 	//static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
-	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/N-0";
-	static final public String SEED3 = "https://www.reddit.com/";
+	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/N-0.html";
+	//static final public String SEED3 = "https://www.reddit.com/";
 	public static PageGraph pageGraph;
     
     public static void main(String[] args) throws Exception {
         int numCrawlers = 3;
         pageGraph = new PageGraph();
+        pageGraph.addVertex(new Vertex(1,SEED2));
         CrawlConfig config = new CrawlConfig();
         
         String crawlStorageFolder = ".";
 
         config.setCrawlStorageFolder(crawlStorageFolder);
         
-        config.setMaxPagesToFetch(6);
+        config.setMaxPagesToFetch(10);
 
 
         config.setPolitenessDelay(1000);

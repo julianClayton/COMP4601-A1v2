@@ -58,12 +58,17 @@ public class Crawler extends WebCrawler{
         
          DatabaseManager dm = DatabaseManager.getInstance();
          dm.addPageToDb(p);
-         if (Controller.pageGraph.hasVertex(parentUrl)) {
-        	 Controller.pageGraph.connectToExistingVertex(v, parentUrl);
-         }
-         else {
-        	 Controller.pageGraph.addVertex(v);
-          }      
+	     if (Controller.pageGraph.hasVertex(parentUrl)) {
+	    	 Controller.pageGraph.connectExisitingVertexToNewVertex(v, parentUrl);
+	     }
+	     else {
+	    	 Controller.pageGraph.addVertex(v);
+	     }
+	     for (String link : p.getLinks()) {
+	    	 if (Controller.pageGraph.hasVertex(link)) {
+	    		 Controller.pageGraph.connectVertex(Controller.pageGraph.getVertex(v.getUrl()), Controller.pageGraph.getVertex(link));
+	    	 }
+	     }
      }    
 } 
     

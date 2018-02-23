@@ -122,7 +122,7 @@ public class DatabaseManager {
 			Vertex v = new Vertex(id,document.getUrl());
 			for (String link : document.getLinks()) {
 				if (pg.hasVertex(link)){
-					pg.connectToExistingVertexAsParent(v, link);
+					pg.connectNewVertexToExistingVertex(v, link);
 				}
 				else {
 					pg.addVertex(v);
