@@ -1,4 +1,5 @@
 package edu.carleton.comp4601.SDA.resources;
+package edu.carleton.comp4601.SDA.resources;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -270,7 +271,7 @@ public class SDA {
 	}
 	@GET
 	@Path("query/{TERMS}")
-	@Produces(MediaType.TEXT_XML)
+	@Produces(MediaType.APPLICATION_XML)
 	public DocumentCollection queryDocsWithTermsXML(@PathParam("TERMS") String terms) {
 	    ArrayList<Document> queryDocs = MyLucene.query(terms);
 	    DocumentCollection docs = new DocumentCollection();
