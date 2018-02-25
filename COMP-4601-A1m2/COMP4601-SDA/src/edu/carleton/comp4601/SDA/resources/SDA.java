@@ -222,7 +222,7 @@ public class SDA {
 		java.net.URI myUri = uriInfo.getBaseUri();
 	
 		for (Document doc : docsList) {
-			String link = "<a href=\"" + myUri.toString() +"/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
+			String link = "<a  href=\"" + myUri.toString() +"sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
 			htmlList = htmlList +  "<li>" + link + "</li>";
 		}
 		htmlList = htmlList + "</ul>";
@@ -265,8 +265,10 @@ public class SDA {
 	public String queryDocsWithTerms(@PathParam("TERMS") String terms) {
 	    ArrayList<Document> queryDocs = MyLucene.query(terms);
 	    String htmlList = "<ul>";
+		java.net.URI myUri = uriInfo.getBaseUri();
+
 		for (Document doc : queryDocs) {
-			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() + " Score: " + doc.getScore() +" </a>";
+			String link = "<a href=\"" + myUri.toString() +"sda/"+doc.getId() + "\">" + doc.getName() + " Score: " + doc.getScore() +" </a>";
 			htmlList = htmlList +  "<li>" + link + "</li>";
 		}
 		htmlList = htmlList + "</ul>";
@@ -290,8 +292,10 @@ public class SDA {
 
 		ArrayList<Document> docs = dbm.getAllDocuments();
 		String htmlList = "<ul>";
+		java.net.URI myUri = uriInfo.getBaseUri();
+
 		for (Document doc : docs) {
-			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
+			String link = "<a href=\"" + myUri.toString() +"sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
 			htmlList = htmlList +  "<li>" + link + "</li>";
 		}
 		htmlList = htmlList + "</ul>";
