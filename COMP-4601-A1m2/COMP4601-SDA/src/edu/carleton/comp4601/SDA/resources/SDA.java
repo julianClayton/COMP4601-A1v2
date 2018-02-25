@@ -104,6 +104,7 @@ public class SDA {
 		try {
 			if (tagsList.size() > 0) {
 				dbm.updateDocTags(Integer.parseInt(id), tagsList);
+				MyLucene.updateDocument(dbm.findDoc(Integer.parseInt(id)));
 			}
 			if (linksList.size() > 0) {
 				dbm.updateDocLinks(Integer.parseInt(id), linksList);
