@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -125,7 +127,7 @@ public class PageRank {
 		ArrayList<Document> documents = DatabaseManager.getInstance().getAllDocuments();
 		ArrayList<HashMap<Integer, Float>> documentsWithRank = new ArrayList<HashMap<Integer, Float>>();
 		pageRankMatrix.print(pageRankMatrix.getRowDimension(), pageRankMatrix.getColumnDimension());
-		for (int i = 0; i < pageRankMatrix.getColumnDimension(); i++) {
+		for (int i = 0; i < documents.size(); i++) {
 			HashMap map = new HashMap<Integer, Float>();
 			map.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
 			boostMap.put(documents.get(i).getId(), (float) pageRankMatrix.get(0, i));
@@ -229,6 +231,9 @@ public class PageRank {
         System.out.println(graph.getGraph());
         
         getInstance().computePageRank();
+        
+    	Path path = FileSystems.getDefault().getPath("").toAbsolutePath();
+    	System.out.println(path.toString());
 	}
 	public HashMap<Integer, Float> getBoostMap() {
 		return boostMap;

@@ -23,7 +23,7 @@ public class Controller {
 	
 	public static ArrayList<String> urls = new ArrayList<String>();
 	
-	//static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
+	static final public String SEED1 = "https://sikaman.dyndns.org/courses/4601/handouts/"; 
 	static final public String SEED2 = "https://sikaman.dyndns.org/courses/4601/resources/N-0.html";
 	//static final public String SEED3 = "https://www.reddit.com/";
 	public static PageGraph pageGraph;
@@ -31,14 +31,16 @@ public class Controller {
     public static void main(String[] args) throws Exception {
         int numCrawlers = 3;
         pageGraph = new PageGraph();
-        pageGraph.addVertex(new Vertex(1,SEED2));
+       pageGraph.addVertex(new Vertex(1,SEED1));
+       pageGraph.addVertex(new Vertex(0,SEED2));
+
         CrawlConfig config = new CrawlConfig();
         
         String crawlStorageFolder = ".";
 
         config.setCrawlStorageFolder(crawlStorageFolder);
         
-        config.setMaxPagesToFetch(10);
+        config.setMaxPagesToFetch(100);
 
 
         config.setPolitenessDelay(1000);
@@ -54,7 +56,7 @@ public class Controller {
         
         CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
 
-        //controller.addSeed(SEED1);
+        controller.addSeed(SEED1);
         controller.addSeed(SEED2);
         //controller.addSeed(SEED3);
        
