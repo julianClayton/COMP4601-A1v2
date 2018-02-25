@@ -1,5 +1,4 @@
 package edu.carleton.comp4601.SDA.resources;
-package edu.carleton.comp4601.SDA.resources;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +17,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+
 import java.util.concurrent.TimeUnit;
 import com.mongodb.MongoException;
 import edu.carleton.comp4601.SDA.db.DatabaseManager;
@@ -218,8 +219,10 @@ public class SDA {
 		docsList.addAll(sr.getDocs());
 		docsList.addAll(queryDocs);
 		String htmlList = "<ul>";
+		java.net.URI myUri = uriInfo.getBaseUri();
+	
 		for (Document doc : docsList) {
-			String link = "<a href=\"http://localhost:8080/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
+			String link = "<a href=\"" + myUri.toString() +"/COMP4601-SDA/rest/sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
 			htmlList = htmlList +  "<li>" + link + "</li>";
 		}
 		htmlList = htmlList + "</ul>";
