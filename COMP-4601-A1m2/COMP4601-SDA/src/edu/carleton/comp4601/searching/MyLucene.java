@@ -251,7 +251,7 @@ public class MyLucene {
 		return	null;	
 	}
 	
-	public static void addDocument(edu.carleton.comp4601.dao.Document newDoc){
+	public static void updateDocument(edu.carleton.comp4601.dao.Document newDoc){
 		try {
 			dir	= FSDirectory.open(new	File(INDEX_DIR));
 			Analyzer analyzer = new	StandardAnalyzer(Version.LUCENE_45);
@@ -259,14 +259,60 @@ public class MyLucene {
 			writer = new IndexWriter(dir, iwc);
 			Document doc = new Document();
 			
+			String tagString = "";
+			
+			for (String t : newDoc.getTags()){
+				tagString += " " + t;
+			}
+			
 			doc.add(new	StringField(URL, "Url undefined: user created doc", Field.Store.YES));
 			doc.add(new	StringField(DOC_ID, newDoc.getId().toString(), Field.Store.YES));
 			doc.add(new	StringField(DATE, new Date().toString(), Field.Store.YES));
-			doc.add(new	TextField(CONTENT, newDoc.getText(), Field.Store.YES));
+			doc.add(new	TextField(CONTENT, newDoc.getText() + tagString, Field.Store.YES));
 			doc.add(new	TextField(METADATA, "User created doc", Field.Store.YES));
 
-			System.out.println("adding document " + newDoc.getId());
+			System.out.println("updating document " + newDoc.getId());
+			TextField content = new TextField(CONTENT, newDoc.getText() + tagString, Field.Store.YES);
+			content.setBoost(2);
 			writer.addDocument(doc);
+
+			if	(writer != null)
+				writer.close();
+		 	if	(dir != null)
+				dir.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	
+	public static void addDocument(edu.carleton.comp4601.dao.Document updateDoc){
+		try {
+			dir	= FSDirectory.open(new	File(INDEX_DIR));
+			Analyzer analyzer = new	StandardAnalyzer(Version.LUCENE_45);
+			IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_45, analyzer);
+			writer = new IndexWriter(dir, iwc);
+			Document doc = new Document();
+			
+			String tagString = "";
+			
+			for (String t : updateDoc.getTags()){
+				tagString += " " + t;
+			}
+			
+			doc.add(new	StringField(URL, "Url undefined: user created doc", Field.Store.YES));
+			doc.add(new	StringField(DOC_ID, updateDoc.getId().toString(), Field.Store.YES));
+			doc.add(new	StringField(DATE, new Date().toString(), Field.Store.YES));
+			doc.add(new	TextField(CONTENT, updateDoc.getText() + tagString, Field.Store.YES));
+			doc.add(new	TextField(METADATA, "User created doc", Field.Store.YES));
+
+			System.out.println("adding document " + updateDoc.getId());
+			TextField content = new TextField(CONTENT, updateDoc.getText() + tagString, Field.Store.YES);
+			content.setBoost(2);
+			Term term = new Term("id", updateDoc.getId().toString());
+			writer.updateDocument(term, doc);
 
 			if	(writer != null)
 				writer.close();
