@@ -7,6 +7,7 @@ import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.url.WebURL;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import Jama.Matrix;
@@ -63,10 +64,13 @@ public class Crawler extends WebCrawler{
 	     else {
 	    	 Controller.pageGraph.addVertex(v);
 	     }
-	     for (String link : p.getLinks()) {
-	    	 if (Controller.pageGraph.hasVertex(link)) {
-	    		 Controller.pageGraph.connectVertex(Controller.pageGraph.getVertex(v.getUrl()), Controller.pageGraph.getVertex(link));
-	    	 }
+	     ArrayList<String> links = p.getLinks();
+	     if (links != null){
+		     for (String link : links) {
+		    	 if (Controller.pageGraph.hasVertex(link)) {
+		    		 Controller.pageGraph.connectVertex(Controller.pageGraph.getVertex(v.getUrl()), Controller.pageGraph.getVertex(link));
+		    	 }
+		     }
 	     }
      }    
 } 

@@ -152,6 +152,10 @@ public class PageParser {
 	  		SDAdoc.setText(handler.toString());
 	  		SDAdoc.setName(title);
 	  	}
+	  	
+	  	if (SDAdoc.getName() == null){
+	  		SDAdoc.setName(url);
+	  	}
 	}
 	
 	private HashMap<String, String> getImgAlts(Document doc){
