@@ -83,10 +83,10 @@ public class PageGraph implements Serializable{
 	public String getGraphUrl() {
 		return baseUrl;
 	}
-	public Graph<Vertex, DefaultEdge> getGraph() {
+	public synchronized Graph<Vertex, DefaultEdge> getGraph() {
 		return directedGraph;
 	}
-	public ConcurrentHashMap getMap() {
+	public synchronized ConcurrentHashMap getMap() {
 		return vertexMap;
 	}
 
