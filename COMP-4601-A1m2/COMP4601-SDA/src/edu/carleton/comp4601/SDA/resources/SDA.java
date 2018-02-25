@@ -223,7 +223,7 @@ public class SDA {
 		java.net.URI myUri = uriInfo.getBaseUri();
 	
 		for (Document doc : docsList) {
-			String link = "<a  href=\"" + myUri.toString() +"sda/"+doc.getId() + "\">" + doc.getName() +" </a>";
+			String link = "<a  href=\"" + doc.getUrl() + "\">" + doc.getName() +" </a>";
 			htmlList = htmlList +  "<li>" + link + "</li>";
 		}
 		htmlList = htmlList + "</ul>";
